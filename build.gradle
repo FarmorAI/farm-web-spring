@@ -35,6 +35,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'net.coobird:thumbnailator:0.4.19'
+	implementation 'com.google.code.gson:gson:2.12.1'
+
 }
 
 tasks.named('test') {
