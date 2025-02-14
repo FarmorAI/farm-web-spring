@@ -24,9 +24,14 @@
     </resultMap>
 
 
-    <!-- 회원 조회 -->
+    <!-- 회원 조회 by ID -->
     <select id="getMemberById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.MemberDto">
         SELECT * FROM member WHERE member_id = #{memberId}
+    </select>
+
+    <!-- 회원 조회 by Email -->
+    <select id="getMemberByEmail" parameterType="String" resultType="com.farmorai.backend.dto.MemberDto">
+        SELECT * FROM member WHERE email = #{email}
     </select>
 
 

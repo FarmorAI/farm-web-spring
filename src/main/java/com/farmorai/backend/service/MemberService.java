@@ -17,9 +17,14 @@ public class MemberService {
         return memberMapper.getAllMember();
     }
 
-    // 회원 조회
+    // 회원 조회 (ID)
     public MemberDto getMemberById(Long memberId) {
         return memberMapper.getMemberById(memberId);
+    }
+
+    // 회원 조회 (Email)
+    public MemberDto getMemberByEmail(String email) {
+        return memberMapper.getMemberByEmail(email);
     }
 
     // 회원 등록

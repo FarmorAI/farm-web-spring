@@ -10,23 +10,24 @@ import com.farmorai.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping(value = "/members")
+@RequestMapping
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
     // 전체 회원 조회
     @ResponseBody
-    @GetMapping("/admin")
+    @GetMapping(value = "/members/admin")
     public List<MemberDto> getAllMember() {
         return memberService.getAllMember();
     }
 
     // 회원 등록
     @ResponseBody
-    @PostMapping
+    @PostMapping(value = "/join")
     public String addMember(@RequestBody MemberDto memberDto) {
         memberDto.setMemberRole(MemberRole.USER);
         memberService.insertMember(memberDto);
@@ -56,10 +57,30 @@ public class MemberController {
     // 회원 삭제
     @ResponseBody
     @DeleteMapping(value = "/auth/{memberId}")
-    public String deleteMember(
-            @PathVariable(value = "memberId") Long memberId
-    ) {
+    public String deleteMember(@PathVariable(value = "memberId") Long memberId) {
         memberService.deleteMember(memberId);
         return "success";
+    }
+
+    // 로그인 정보 { "email": "", "password": "" }
+    @ResponseBody
+    @PostMapping("/login")
+    public String login(@RequestBody Map<String, String> loginInfo) {
+        String email = loginInfo.get("email");
+        String password = loginInfo.get("password");
+        MemberDto memberDto = memberService.getMemberByEmail(email);
+
+        if(memberDto.getPassword().equals(password)) {
+            return "Login Success";
+        } else {
+            return "Login Failed";
+        }
+    }
+
+    // 로그아웃
+    @ResponseBody
+    @GetMapping("/auth/logout")
+    public String logout() {
+        return "Logout";
     }
 }
