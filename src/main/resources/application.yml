@@ -1,3 +1,23 @@
 spring:
-  application:
-    name: backend
+  servlet:
+    multipart:
+      enabled: true                 # 파일 업로드 활성화
+      max-file-size: 10MB           # 파일 최대 크기
+      max-request-size: 10MB        # 요청 최대 크기
+  datasource:
+    hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      username: ojm
+      password: cx1565
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      minimum-idle: 5                # 최소 유지 커넥션 수
+      maximum-pool-size: 20          # 최대 커넥션 수 (트래픽 증가 대비)
+      idle-timeout: 60000            # 유휴 커넥션 유지 시간 (밀리초)
+      max-lifetime: 1800000          # 커넥션 최대 유지 시간 (밀리초)
+      connection-timeout: 30000      # 커넥션 요청 대기 시간 (밀리초)
+      pool-name: MyHikariPool        # 풀 이름 지정
+      auto-commit: true              # 자동 커밋 여부
+      connection-test-query: SELECT 1  # 커넥션 유효성 검사 쿼리
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+  config-location: classpath:/mybatis-config.xml
