@@ -19,31 +19,31 @@ public class MemberController {
 
     // 전체 회원 조회
     @ResponseBody
-    @GetMapping
+    @GetMapping("/admin")
     public List<MemberDto> getAllMember() {
         return memberService.getAllMember();
     }
 
-    // 회원 조회
-    @ResponseBody
-    @GetMapping(value = "/{memberId}")
-    public MemberDto getMemberById(@PathVariable(value = "memberId") Long memberId) {
-        System.out.println(memberId);
-        return memberService.getMemberById(memberId);
-    }
-
     // 회원 등록
     @ResponseBody
-    @PostMapping(value = "/add")
+    @PostMapping
     public String addMember(@RequestBody MemberDto memberDto) {
         memberDto.setMemberRole(MemberRole.USER);
         memberService.insertMember(memberDto);
         return "success";
     }
 
+    // 회원 조회
+    @ResponseBody
+    @GetMapping(value = "/auth/{memberId}")
+    public MemberDto getMemberById(@PathVariable(value = "memberId") Long memberId) {
+        System.out.println(memberId);
+        return memberService.getMemberById(memberId);
+    }
+
     // 회원 수정
     @ResponseBody
-    @PutMapping(value = "/{memberId}")
+    @PutMapping(value = "/auth/{memberId}")
     public String updateMember(
             @PathVariable(value = "memberId") Long memberId,
             @RequestBody MemberDto memberDto
@@ -55,7 +55,7 @@ public class MemberController {
 
     // 회원 삭제
     @ResponseBody
-    @DeleteMapping(value = "/{memberId}")
+    @DeleteMapping(value = "/auth/{memberId}")
     public String deleteMember(
             @PathVariable(value = "memberId") Long memberId
     ) {
