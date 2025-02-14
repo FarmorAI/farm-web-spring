@@ -24,7 +24,10 @@ repositories {
 }
 
 dependencies {
-	// DB 관련
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Database
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'com.zaxxer:HikariCP:5.1.0'

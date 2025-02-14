@@ -12,6 +12,7 @@
     <resultMap id="memberResult" type="com.farmorai.backend.dto.MemberDto">
         <result property="memberId" column="member_id" />
         <result property="email" column="email" />
+        <result property="password" column="password" />
         <result property="name" column="name" />
         <result property="nickname" column="nickname" />
         <result property="phone" column="phone" />
@@ -31,8 +32,8 @@
 
     <!-- 회원 등록 -->
     <insert id="insertMember" parameterType="com.farmorai.backend.dto.MemberDto">
-        INSERT INTO member (email, name, nickname, phone, birth_date, member_role, address, created_at, updated_at)
-        VALUES (#{email}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now())
+        INSERT INTO member (email, password, name, nickname, phone, birth_date, member_role, address, created_at, updated_at)
+        VALUES (#{email}, #{password}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now())
     </insert>
 
 
@@ -40,6 +41,7 @@
     <update id="updateMember" parameterType="com.farmorai.backend.dto.MemberDto">
         UPDATE member SET
             email = #{email},
+            password = #{password},
             name = #{name},
             nickname = #{nickname},
             phone = #{phone},
