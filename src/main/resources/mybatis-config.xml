@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <environments default="development">
+        <!-- MySQL에 대한 연결 정보 -->
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver"   value="com.mysql.cj.jdbc.Driver" />
+                <property name="url"      value="jdbc:mysql://localhost:3306/farmdb" />
+                <property name="username" value="ojm" />
+                <property name="password" value="cx1565" />
+            </dataSource>
+        </environment>
+    </environments>
 
-</beans>
+    <mappers>
+        <!-- xml문서의 물리적인 위치와 파일명을 등록 -->
+        <mapper resource="mappers/MemberMapper.xml" />
+    </mappers>
+</configuration>

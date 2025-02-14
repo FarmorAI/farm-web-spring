@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MyBatis 매퍼 파일의 루트 태그. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.MemberMapper">
+    <select id="getMemberById" parameterType="int" resultType="com.farmorai.backend.domain.Member">
+        SELECT member_id, name FROM member WHERE member_id = #{id}
+    </select>
+    <!-- 나머지 CRUD 작업에 대한 SQL 문을 여기에 추가합니다. -->
+</mapper>
