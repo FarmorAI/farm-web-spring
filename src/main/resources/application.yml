@@ -25,4 +25,8 @@ mybatis:
 com:
   farmorai:
     upload:
-      path: upload  # 프로젝트 루트의 upload 폴더에 저장
+      path: upload
+
+fastapi:
+  server:
+    url: http://localhost:8000
