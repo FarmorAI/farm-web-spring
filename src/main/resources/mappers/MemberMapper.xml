@@ -3,8 +3,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.farmorai.backend.mapper.MemberMapper">
-    <select id="getMemberById" parameterType="int" resultType="com.farmorai.backend.domain.Member">
-        SELECT member_id, name FROM member WHERE member_id = #{id}
+
+    <!-- 전체 회원 조회 -->
+    <select id="getAllMember" resultMap="memberResult">
+        SELECT * FROM member
     </select>
-    <!-- 나머지 CRUD 작업에 대한 SQL 문을 여기에 추가합니다. -->
+    <!-- MemberDto Mapping -->
+    <resultMap id="memberResult" type="com.farmorai.backend.dto.MemberDto">
+        <result property="memberId" column="member_id" />
+        <result property="email" column="email" />
+        <result property="name" column="name" />
+        <result property="nickname" column="nickname" />
+        <result property="phone" column="phone" />
+        <result property="birthDate" column="birth_date" />
+        <result property="memberRole" column="member_role" />
+        <result property="address" column="address" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+
+    <!-- 회원 조회 -->
+    <select id="getMemberById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.MemberDto">
+        SELECT * FROM member WHERE member_id = #{memberId}
+    </select>
+
+
+    <!-- 회원 등록 -->
+    <insert id="insertMember" parameterType="com.farmorai.backend.dto.MemberDto">
+        INSERT INTO member (email, name, nickname, phone, birth_date, member_role, address, created_at, updated_at)
+        VALUES (#{email}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now())
+    </insert>
+
+
+    <!-- 회원 수정 -->
+    <update id="updateMember" parameterType="com.farmorai.backend.dto.MemberDto">
+        UPDATE member SET
+            email = #{email},
+            name = #{name},
+            nickname = #{nickname},
+            phone = #{phone},
+            birth_date = #{birthDate},
+            member_role = #{memberRole},
+            address = #{address}
+        WHERE member_id = #{memberId}
+    </update>
+
+
+    <!-- 회원 삭제 -->
+    <delete id="deleteMember" parameterType="java.lang.Long">
+        DELETE FROM member WHERE member_id = #{memberId}
+    </delete>
 </mapper>
