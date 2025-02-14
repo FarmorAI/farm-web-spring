@@ -15,4 +15,5 @@ public interface NoticeMapper {
 
     void deleteNotice(Long notice_no);
 
+    
 }
