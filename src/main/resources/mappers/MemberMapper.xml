@@ -44,7 +44,6 @@
             nickname = #{nickname},
             phone = #{phone},
             birth_date = #{birthDate},
-            member_role = #{memberRole},
             address = #{address}
         WHERE member_id = #{memberId}
     </update>
