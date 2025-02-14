@@ -10,6 +10,7 @@ public interface MemberMapper {
     List<MemberDto> getAllMember();
 
     MemberDto getMemberById(Long memberId);
+    MemberDto getMemberByEmail(String email);
 
     void insertMember(MemberDto memberDto);
 
