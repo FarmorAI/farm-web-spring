@@ -34,7 +34,7 @@ public class SecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // CSRF(Cross-Site Request Forgery) 비활성화
         http.csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsSource()))
+//            .cors(cors -> cors.configurationSource(corsSource()))
             // 권한에 따른 HTTP 요청 인가 설정
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
 //                        .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())

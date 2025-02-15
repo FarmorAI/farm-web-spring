@@ -3,16 +3,27 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.farmorai.backend.mapper.NoticeMapper">
-
     <select id="getNoticeList" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT * FROM notices
+        SELECT * FROM notice
     </select>
 
+    <select id="getNoticeDetail" parameterType="Long" resultType="com.farmorai.backend.dto.NoticeDto">
+        SELECT notice_id ,title, writer ,content, views, created_at, updated_at  FROM notice WHERE notice_id = #{noticeId}
+    </select>
+
+    <update id="updateNoticeViews" parameterType="Long">
+        UPDATE notice SET views = views + 1 WHERE notice_id = #{noticeId}
+    </update>
+
     <insert id="insertNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
-        INSERT INTO notices (title, content, writer) VALUES (#{title}, #{content}, #{writer})
+        INSERT INTO notice (title, content, writer, created_at, updated_at) VALUES (#{title}, #{content}, #{writer}, now(),now())
     </insert>
 
+    <update id="updateNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
+        UPDATE notice SET title = #{notice.title}, content = #{notice.content}, updated_at = now() WHERE notice_id = #{noticeId}
+    </update>
+
     <delete id="deleteNotice" parameterType="Long">
-        DELETE FROM notices WHERE notice_no = #{notice_no}
+        DELETE FROM notice WHERE notice_id = #{noticeId}
     </delete>
 </mapper>

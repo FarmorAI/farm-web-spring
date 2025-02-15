@@ -22,15 +22,27 @@ public class NoticeService {
     }
 
     @Transactional
+    public NoticeDto getNoticeDetail(Long noticeId) {
+        noticeMapper.updateNoticeViews(noticeId); // 조회수 증가
+        return noticeMapper.getNoticeDetail(noticeId); // 상세 조회
+    }
+
+
+    @Transactional
     public void insertNotice(NoticeDto noticeDto) {
         noticeMapper.insertNotice(noticeDto);
     }
 
     @Transactional
-    public void deleteNotice(Long notice_no) {
-        noticeMapper.deleteNotice(notice_no);
+    public void deleteNotice(Long noticeId) {
+        noticeMapper.deleteNotice(noticeId);
     }
 
+
+    @Transactional
+    public void updateNotice(Long noticeId, NoticeDto noticeDto) {
+        noticeMapper.updateNotice(noticeId, noticeDto);
+    }
 
 
 }
