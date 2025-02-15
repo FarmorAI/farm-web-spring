@@ -68,28 +68,4 @@ public class MemberController {
         memberService.deleteMember(memberId);
         return "success";
     }
-
-
-    @ResponseBody
-    @PostMapping("/login")
-    public String login(@RequestBody Map<String, String> loginInfo) {
-        // 로그인 정보 { "email": "", "password": "" }
-        log.info("loginInfo: {}", loginInfo);
-        String email = loginInfo.get("email");
-        String password = loginInfo.get("password");
-        MemberDto memberDto = memberService.getMemberByEmail(email);
-
-        if(memberDto.getPassword().equals(password)) {
-            return "Login Success";
-        } else {
-            return "Login Failed";
-        }
-    }
-
-    // 로그아웃
-    @ResponseBody
-    @GetMapping("/auth/logout")
-    public String logout() {
-        return "Logout";
-    }
 }
