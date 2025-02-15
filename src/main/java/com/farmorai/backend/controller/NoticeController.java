@@ -21,16 +21,28 @@ public class NoticeController {
         return noticeService.getNoticeList();
     }
 
+    @GetMapping("/{noticeId}")
+    public NoticeDto getNoticeDetail(@PathVariable Long noticeId) {
+        return noticeService.getNoticeDetail(noticeId);
+    }
+
 
     @PostMapping
     public Map<String,String> insertNotice(@RequestBody NoticeDto noticeDto) {
+
         noticeService.insertNotice(noticeDto);
         return Map.of("result","success");
     }
 
-    @DeleteMapping("/{notice_no}")
-    public Map<String,String> deleteNotice(@PathVariable Long notice_no) {
-        noticeService.deleteNotice(notice_no);
+    @PutMapping("/{noticeId}")
+    public Map<String,String> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeDto noticeDto) {
+        noticeService.updateNotice(noticeId, noticeDto);
+        return Map.of("result","success");
+    }
+
+    @DeleteMapping("/{noticeId}")
+    public Map<String,String> deleteNotice(@PathVariable Long noticeId) {
+        noticeService.deleteNotice(noticeId);
         return Map.of("result","success");
     }
 
