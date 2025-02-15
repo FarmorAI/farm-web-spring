@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <mappers>
-        <mapper resource="mapper/notice.xml"/>
+        <!-- xml문서의 물리적인 위치와 파일명을 등록 -->
+        <mapper resource="mappers/memberMapper.xml" />
+        <mapper resource="mappers/notice.xml"/>
     </mappers>
 </configuration>
