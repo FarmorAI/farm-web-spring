@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Service
-public class AIService {
+public class FileUploadService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String fastApiUrl = "http://localhost:8000/detect";  // FastAPI 서버 주소
 
