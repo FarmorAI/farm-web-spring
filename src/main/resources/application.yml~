@@ -4,10 +4,6 @@ spring:
       enabled: true                 # 파일 업로드 활성화
       max-file-size: 10MB           # 파일 최대 크기
       max-request-size: 10MB        # 요청 최대 크기
-  spring:
-    output:
-      ansi:
-        enabled: always
   datasource:
     hikari:
       jdbc-url: jdbc:mysql://localhost:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
@@ -22,6 +18,7 @@ spring:
       pool-name: MyHikariPool        # 풀 이름 지정
       auto-commit: true              # 자동 커밋 여부
       connection-test-query: SELECT 1  # 커넥션 유효성 검사 쿼리
+
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml

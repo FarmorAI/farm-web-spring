@@ -2,6 +2,7 @@ package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
 import com.farmorai.backend.dto.MemberRole;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class MemberController {
 
     // 전체 회원 조회
     @ResponseBody
-    @GetMapping(value = "/members/admin")
+    @GetMapping(value = "/admin/members")
     public List<MemberDto> getAllMember() {
         return memberService.getAllMember();
     }
@@ -47,9 +49,14 @@ public class MemberController {
     @PutMapping(value = "/auth/{memberId}")
     public String updateMember(
             @PathVariable(value = "memberId") Long memberId,
-            @RequestBody MemberDto memberDto
+            @RequestBody Map<String, String> updateInfo
     ) {
-        memberDto.setMemberId(memberId);
+        MemberDto memberDto = memberService.getMemberById(memberId);
+        memberDto.setName(updateInfo.get("name"));
+        memberDto.setNickname(updateInfo.get("nickname"));
+        memberDto.setPhone(updateInfo.get("phone"));
+        memberDto.setBirthDate(updateInfo.get("birthDate"));
+        memberDto.setAddress(updateInfo.get("address"));
         memberService.updateMember(memberDto);
         return "success";
     }
@@ -62,10 +69,12 @@ public class MemberController {
         return "success";
     }
 
-    // 로그인 정보 { "email": "", "password": "" }
+
     @ResponseBody
     @PostMapping("/login")
     public String login(@RequestBody Map<String, String> loginInfo) {
+        // 로그인 정보 { "email": "", "password": "" }
+        log.info("loginInfo: {}", loginInfo);
         String email = loginInfo.get("email");
         String password = loginInfo.get("password");
         MemberDto memberDto = memberService.getMemberByEmail(email);
