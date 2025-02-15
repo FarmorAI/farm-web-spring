@@ -1,0 +1,11 @@
+package com.farmorai.backend.config;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@MapperScan("com.farmorai.backend.mapper")
+public class MyBatisConfig {
+
+}
