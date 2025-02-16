@@ -15,8 +15,8 @@ spring:
   datasource:
     hikari:
       jdbc-url: jdbc:mysql://localhost:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      username: ojm
-      password: cx1565
+      username: root
+      password: cx@1076044150
       driver-class-name: com.mysql.cj.jdbc.Driver
       minimum-idle: 5                # 최소 유지 커넥션 수
       maximum-pool-size: 20          # 최대 커넥션 수 (트래픽 증가 대비)
