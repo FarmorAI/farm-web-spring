@@ -52,18 +52,12 @@ public class SecurityConfig {
     // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고
     // "UsernamePasswordAuthentication" 객체를 만들어 "ProviderManager"에 제공
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    public AuthenticationManager authManager(MemberDetailsService memberDetailsService) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(memberDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authManager(DaoAuthenticationProvider authProvider) throws Exception {
         return new ProviderManager(authProvider);
     }
-
 
     // 보안 필터 체인 (Bean 등록)
     @Bean
