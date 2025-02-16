@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.CommentMapper">
+    <select id="getCommentList" parameterType="Long" resultType="com.farmorai.backend.dto.CommentDto">
+        SELECT c.comment_id, c.notice_id, c.content, c.created_at, c.updated_at, m.nickname
+        FROM comment c
+        INNER JOIN member m ON c.member_id = m.member_id
+        WHERE notice_id = #{noticeId}
+        ORDER BY comment_id DESC
+    </select>
+
+    <insert id="insertComment" parameterType="com.farmorai.backend.dto.CommentDto">
+        INSERT INTO comment (notice_id, member_id, content, created_at, updated_at)
+        VALUES (#{noticeId}, #{comment.memberId}, #{comment.content}, now(), now())
+    </insert>
+
+
+</mapper>
