@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.BoardMapper">
+    <select id = "getBoardList" resultType="com.farmorai.backend.dto.BoardDto">
+            SELECT * FROM board
+    </select>
+
+    <select id = "getBoardDetail" resultType = "com.farmorai.backend.dto.BoardDto">
+        SELECT board_id, title, content, views, created_at, updated_at FROM board WHERE board_id = #{boardId}
+    </select>
+
+    <insert id = "insertBoard" parameterType="com.farmorai.backend.dto.BoardDto">
+        INSERT INTO board (title, content, created_at, updated_at) VALUES (#{title}, #{content}, now(), now())
+    </insert>
+
+    <delete id = "deleteBoard" parameterType="Long">
+        DELETE FROM board WHERE board_id = #{boardId}
+    </delete>
+
+    <update id = "updateBoard" parameterType = "com.farmorai.backend.dto.BoardDto">
+        UPDATE board SET title = #{board.title}, content = #{board.content}, updated_at = now() WHERE board_id = #{boardId}
+    </update>
+
+    <update id = "updateBoardViews" parameterType = "Long">
+        UPDATE board SET views = views + 1 WHERE board_id = #{boardId}
+    </update>
+</mapper>
