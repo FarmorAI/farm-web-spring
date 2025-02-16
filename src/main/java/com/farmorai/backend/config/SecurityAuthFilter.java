@@ -50,8 +50,10 @@ public class SecurityAuthFilter extends UsernamePasswordAuthenticationFilter {
     // 로그인 성공 시
     @Override
     protected void successfulAuthentication(
-            HttpServletRequest req, HttpServletResponse resp,
-            FilterChain chain, Authentication authResult
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            FilterChain chain,
+            Authentication authResult
     ) throws IOException, ServletException {
 
         HttpSession session = req.getSession(true);  //세션 생성
