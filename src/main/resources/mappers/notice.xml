@@ -1,18 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-<mapper namespace="com.farmorai.backend.mapper.NoticeMapper">
-
-    <select id="getNoticeList" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT * FROM notices
-    </select>
-
-    <insert id="insertNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
-        INSERT INTO notices (title, content, writer) VALUES (#{title}, #{content}, #{writer})
-    </insert>
-
-    <delete id="deleteNotice" parameterType="Long">
-        DELETE FROM notices WHERE notice_no = #{notice_no}
-    </delete>
-</mapper>
+</beans>
