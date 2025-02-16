@@ -1,6 +1,8 @@
 package com.farmorai.backend.config;
 
 import com.farmorai.backend.dto.MemberRole;
+import com.farmorai.backend.securityFilter.AuthFilter;
+import com.farmorai.backend.securityFilter.AuthStrategy;
 import com.farmorai.backend.service.MemberDetailsService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final AuthStrategy authStrategy;
     private final MemberDetailsService memberDetailsService;
 
     // 비밀번호 단방향 암호화 인터페이스 (Bean 등록)
@@ -62,8 +65,7 @@ public class SecurityConfig {
     // 보안 필터 체인 (Bean 등록)
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        SecurityAuthFilter securityAuthFilter = new SecurityAuthFilter(authManager);
-        securityAuthFilter.setFilterProcessesUrl("/login"); // URL 수정
+        AuthFilter authFilter = new AuthFilter(authManager, authStrategy);
 
         http.csrf(AbstractHttpConfigurer::disable)  // CSRF(Cross-Site Request Forgery) 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))
@@ -74,28 +76,15 @@ public class SecurityConfig {
                     .anyRequest().permitAll()
             )
             // 로그인 인증 설정
-            .addFilterBefore(
-                    securityAuthFilter,
-                    UsernamePasswordAuthenticationFilter.class
-            )
-            // 세션 관리 설정
-            .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                    .maximumSessions(1)               // 동시 세션 제한
-                    .maxSessionsPreventsLogin(false)  // 기존 세션 만료
-            )
+            .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
             // 로그아웃 설정
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessHandler((req, resp, authentication) -> {
-                    resp.setContentType("application/json");
-                    resp.setCharacterEncoding("UTF-8");
-                    resp.getWriter().write("로그아웃 성공");
-                })
-                .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
+                .logoutSuccessHandler((req, res, authentication) ->
+                        authStrategy.logout(req, res))
             );
+
+        authStrategy.configHttpSecurity(http);  // 전략별 추가 설정 적용
         return http.build();
     }
 

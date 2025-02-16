@@ -36,12 +36,18 @@ public class MemberController {
         return "success";
     }
 
-    // 회원 조회
+    // 회원 조회 (by id)
     @ResponseBody
     @GetMapping(value = "/auth/{memberId}")
     public MemberDto getMemberById(@PathVariable(value = "memberId") Long memberId) {
-        System.out.println(memberId);
         return memberService.getMemberById(memberId);
+    }
+
+    // 회원 조회 (by email)
+    @ResponseBody
+    @GetMapping(value = "/auth/{email}")
+    public MemberDto getMemberByEmail(@PathVariable(value = "email") String email) {
+        return memberService.getMemberByEmail(email);
     }
 
     // 회원 수정
