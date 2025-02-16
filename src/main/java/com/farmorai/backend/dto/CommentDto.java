@@ -1,6 +1,5 @@
 package com.farmorai.backend.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,21 +9,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeDto {
+public class CommentDto {
 
-    private Long noticeId;
 
-    private String title;
-
+    private Long commentId;
     private String content;
-
-    private String writer;
-
-    private int views;
-
     private String createdAt;
-
     private String updatedAt;
+    private Long noticeId;
+    private Long memberId;
 
 
 }

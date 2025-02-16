@@ -3,8 +3,31 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.farmorai.backend.mapper.NoticeMapper">
-    <select id="getNoticeList" resultType="com.farmorai.backend.dto.NoticeDto">
+    <select id="getNoticeList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.NoticeDto">
         SELECT * FROM notice
+        <where>
+            1=1
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+        ORDER BY notice_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="getNoticeListCount" parameterType="Map" resultType="int">
+        SELECT COUNT(*) FROM notice
+        <where>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
     </select>
 
     <select id="getNoticeDetail" parameterType="Long" resultType="com.farmorai.backend.dto.NoticeDto">

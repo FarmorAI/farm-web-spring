@@ -2,6 +2,8 @@ package com.farmorai.backend.service;
 
 
 import com.farmorai.backend.dto.NoticeDto;
+import com.farmorai.backend.dto.PageRequestDto;
+import com.farmorai.backend.dto.PageResponseDto;
 import com.farmorai.backend.mapper.NoticeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,14 @@ public class NoticeService {
     private final NoticeMapper noticeMapper;
 
 
-    public List<NoticeDto> getNoticeList() {
-        return noticeMapper.getNoticeList();
+    public PageResponseDto<NoticeDto> getNoticeList(PageRequestDto pageRequestDto) {
+        List<NoticeDto> noticeList = noticeMapper.getNoticeList(pageRequestDto);
+        int totalCount = noticeMapper.getNoticeListCount(pageRequestDto);
+        return PageResponseDto.<NoticeDto>builder()
+                .dtoList(noticeList)
+                .pageRequestDto(pageRequestDto)
+                .total(totalCount)
+                .build();
     }
 
     @Transactional
