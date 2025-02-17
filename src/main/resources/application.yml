@@ -27,6 +27,14 @@ spring:
       auto-commit: true              # 자동 커밋 여부
       connection-test-query: SELECT 1  # 커넥션 유효성 검사 쿼리
 
+  auth:
+    strategy: jwt        # 인증 전략: session, jwt 중 1택
+  session:
+    timeout: 1800000     # 세션 만료 시간 (밀리초)
+  jwt:
+    secret: ZmFtb3JhaQ== # jwt secretKey (base64, farmorai)
+    expiration: 3600000  # jwt 유효시간
+
 mybatis:
   mapper-locations: classpath:/mappers/**/*.xml
   config-location: classpath:/mybatis-config.xml

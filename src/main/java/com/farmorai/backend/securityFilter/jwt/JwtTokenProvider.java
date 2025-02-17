@@ -1,6 +1,7 @@
 package com.farmorai.backend.securityFilter.jwt;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,32 +22,34 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class JwtTokenProvider {
+    private SecretKey secretKey;       // JWT 토큰 객체 키를 저장할 시크릿 키
 
-    @Value("${jwt.expiration}")
-    private long tokenValidityInTime; // 토큰 유효 시간(ms)
-    private SecretKey secretKey;      // JWT 토큰 객체 키를 저장할 시크릿 키
+    @Value("${spring.jwt.expiration}")
+    private long tokenValidityInTime;  // 토큰 유효 시간(ms)
 
-    // SecretKey 생성
-    public JwtTokenProvider(@Value("${jwt.secret}") String secret) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());  // HMAC-SHA 알고리즘으로 서명한 키 생성
+    /**
+     * SecretKey 설정
+     * 1. secret        : JWT의 서명을 위한 비밀키(Base64 인코딩된 문자열)를 참조
+     * 2. byteSecretKey : Base64로 인코딩된 문자열을 바이트 배열로 변환
+     * 3. secretKey     : HMAC-SHA 알고리즘을 사용하여 JWT 서명에 사용할 SecretKey 객체 생성
+     */
+    public JwtTokenProvider(@Value("${spring.jwt.secret}") String secret) {
+        byte[] byteSecretKey = Decoders.BASE64.decode(secret);
+        this.secretKey = Keys.hmacShaKeyFor(byteSecretKey);
     }
 
     // jwt 토큰 생성
-    public String createToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));    // "ROLE_USER,ROLE_ADMIN" 문자열로 권한 반환
-
-        long now = System.currentTimeMillis();                // 현재 시간(ms)
-        Date validity = new Date(now + tokenValidityInTime);  // 토큰 유효 기간 설정 (현재 시간 + 토큰 유효 시간)
+    public String createJwtToken(String email, String role) {
+        long now = System.currentTimeMillis();                 // 현재 시간(ms)
+        Date validity = new Date(now + tokenValidityInTime);   // 토큰 유효 기간 설정 (현재 시간 + 토큰 유효 시간)
 
         return Jwts.builder()
-                .setSubject(authentication.getName()) // 토큰의 주체 설정 (인증된 사용자 이름)
-                .claim("auth", authorities)        // "auth"라는 키로 권한 정보 추가
-                .setIssuedAt(new Date(now))           // 토큰 발급 시간 설정
-                .setExpiration(validity)              // 토큰 만료 시간 설정
-                .signWith(secretKey)                  // JWT 서명 (시크릿 키로 서명)
-                .compact();                           // JWT 토큰을 문자열로 반환
+                .claim("email", email)                      // "email"로 이메일 정보 추가
+                .claim("auth", role)                        // "auth"로 권한 정보 추가
+                .setIssuedAt(new Date(now))                    // 토큰 발급 시간 설정
+                .setExpiration(validity)                       // 토큰 만료 시간 설정
+                .signWith(secretKey, SignatureAlgorithm.HS256) // JWT 서명 (시크릿 키로 서명)
+                .compact();                                    // JWT 토큰을 문자열로 반환
     }
 
     // jwt 토큰 정보 파싱
@@ -67,6 +70,11 @@ public class JwtTokenProvider {
     public long getRemainingTime(String token) {
         Date expiration = getExpirationTime(token);
         return expiration.getTime() - System.currentTimeMillis();
+    }
+
+    public Boolean isJwtExpired(String token) {
+        return Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(token).getBody().getExpiration().before(new Date());
     }
 
 
@@ -101,34 +109,3 @@ public class JwtTokenProvider {
         return false;
     }
 }
-
-/**
- * 주요 기능:
- *
- * 토큰 생성 (createToken):
- *
- * 사용자 이름과 권한 정보를 포함
- * 발급 시간과 만료 시간 설정
- * HMAC-SHA 알고리즘으로 서명
- *
- *
- * 토큰 인증 (getAuthentication):
- *
- * 토큰에서 사용자 정보와 권한 추출
- * Spring Security Authentication 객체 생성
- *
- *
- * 토큰 검증 (validateToken):
- *
- * 서명 검증
- * 만료 여부 확인
- * 토큰 형식 검증
- * 상세한 예외 처리와 로깅
- *
- *
- * 유틸리티 메서드:
- *
- * getClaims: 토큰에서 클레임 정보 추출
- * getExpirationDate: 만료 시간 조회
- * getRemainingTime: 남은 유효 시간 조회
- */

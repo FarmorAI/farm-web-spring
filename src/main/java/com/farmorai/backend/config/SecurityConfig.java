@@ -1,8 +1,8 @@
 package com.farmorai.backend.config;
 
 import com.farmorai.backend.dto.MemberRole;
-import com.farmorai.backend.securityFilter.AuthFilter;
 import com.farmorai.backend.securityFilter.AuthStrategy;
+import com.farmorai.backend.securityFilter.AuthenticationFilter;
 import com.farmorai.backend.service.MemberDetailsService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -55,7 +54,7 @@ public class SecurityConfig {
     // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고
     // "UsernamePasswordAuthentication" 객체를 만들어 "ProviderManager"에 제공
     @Bean
-    public AuthenticationManager authManager(MemberDetailsService memberDetailsService) {
+    public AuthenticationManager authManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(memberDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -65,7 +64,7 @@ public class SecurityConfig {
     // 보안 필터 체인 (Bean 등록)
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        AuthFilter authFilter = new AuthFilter(authManager, authStrategy);
+        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
 
         http.csrf(AbstractHttpConfigurer::disable)  // CSRF(Cross-Site Request Forgery) 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))
@@ -87,6 +86,7 @@ public class SecurityConfig {
         authStrategy.configHttpSecurity(http);  // 전략별 추가 설정 적용
         return http.build();
     }
+
 
     // CORS 설정
     @Bean
