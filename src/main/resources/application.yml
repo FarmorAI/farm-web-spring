@@ -9,14 +9,14 @@ spring:
   servlet:
     multipart:
       enabled: true                 # 파일 업로드 활성화
-      max-file-size: 10MB           # 파일 최대 크기
-      max-request-size: 10MB        # 요청 최대 크기
+      max-file-size: 50MB           # 파일 최대 크기
+      max-request-size: 50MB        # 요청 최대 크기
 
   datasource:
     hikari:
       jdbc-url: jdbc:mysql://localhost:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      username: root
-      password: cx@1076044150
+      username: ojm
+      password: cx1565
       driver-class-name: com.mysql.cj.jdbc.Driver
       minimum-idle: 5                # 최소 유지 커넥션 수
       maximum-pool-size: 20          # 최대 커넥션 수 (트래픽 증가 대비)
@@ -32,7 +32,7 @@ spring:
   session:
     timeout: 1800000     # 세션 만료 시간 (밀리초)
   jwt:
-    secret: ZmFtb3JhaQ== # jwt secretKey (base64, farmorai)
+    secret: ZmFybW9yYWlmYXJtb3JhaWZhcm1vcmFpZmFybW9yYWlmYXJtb3JhaQ==  # jwt secretKey (base64, farmorai * 5)
     expiration: 3600000  # jwt 유효시간
 
 mybatis:
@@ -47,4 +47,4 @@ com:
 
 fastapi:
   server:
-    url: http://localhost:8000
+    url: http://localhost:9090

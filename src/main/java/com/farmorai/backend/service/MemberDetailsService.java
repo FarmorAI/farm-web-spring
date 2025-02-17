@@ -12,12 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MemberDetailsService implements UserDetailsService {
-    private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
         // Member 객체 조회 및 null 체크
-        MemberDto memberDto = memberService.getMemberByEmail(email);
+        MemberDto memberDto = memberMapper.getMemberByEmail(email);
         if(memberDto == null) {
             throw new UsernameNotFoundException("User not found: " + email);
         }

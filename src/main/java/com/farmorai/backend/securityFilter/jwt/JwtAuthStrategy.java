@@ -60,11 +60,11 @@ public class JwtAuthStrategy implements AuthStrategy {
                 // Authorization 키에 JWT가 존재하는 경우
                 // JWT를 검증하고 강제로 SecurityContextHolder 에 세션을 생성한다.
                 // (이 세션은 STATELESS 상태로 관리되므로 해당 요청이 끝나면 소멸됨)
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//            .addFilterBefore(
-//                new JwtAuthFilter(jwtTokenProvider),
-//                UsernamePasswordAuthenticationFilter.class
-//            );
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(
+                new JwtFilter(jwtTokenProvider),
+                UsernamePasswordAuthenticationFilter.class
+            );
     }
 
     @Override
