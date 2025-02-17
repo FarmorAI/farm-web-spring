@@ -24,6 +24,9 @@ repositories {
 }
 
 dependencies {
+	// .env for Spring
+	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+
 	// Spring Security & JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
