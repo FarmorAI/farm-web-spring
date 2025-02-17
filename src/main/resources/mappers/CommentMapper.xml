@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.CommentMapper">
+    <select id = "getCommentList" parameterType="Long" resultType = "com.farmorai.backend.dto.CommentDto">
+        SELECT comment_id, content FROM comment WHERE board_id = #{boardId}
+    </select>
+
+    <insert id = "insertComment" parameterType = "com.farmorai.backend.dto.CommentDto">
+        INSERT INTO comment (board_id, parent_comment_id, content, created_at, updated_at) VALUES (#{board_id}, #{parent_comment_id}, #{content}, now(), now())
+    </insert>
+
+    <delete id = "deleteComment" parameterType = "Long">
+        DELETE FROM comment WHERE comment_id = #{commentId}
+    </delete>
+
+    <update id = "updateComment" parameterType = "com.farmorai.backend.dto.CommentDto">
+        UPDATE comment SET content = #{comment.content}, updated_at = now() WHERE comment_id = #{commentId}
+    </update>
+</mapper>
