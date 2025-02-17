@@ -31,7 +31,6 @@ public class MemberController {
     @ResponseBody
     @PostMapping(value = "/join")
     public String addMember(@RequestBody MemberDto memberDto) {
-        memberDto.setMemberRole(MemberRole.USER);
         memberService.insertMember(memberDto);
         return "success";
     }

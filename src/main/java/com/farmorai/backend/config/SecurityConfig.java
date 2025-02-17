@@ -38,20 +38,11 @@ public class SecurityConfig {
     // 비밀번호 단방향 암호화 인터페이스 (Bean 등록)
     @Bean
     protected PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString(); // 비밀번호를 그대로 반환
-            }
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword); // 평문 비교
-            }
-        };
+        return new BCryptPasswordEncoder();
     }
 
     // "DaoAuthenticationProvider"는
-    // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고
+    // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고,
     // "UsernamePasswordAuthentication" 객체를 만들어 "ProviderManager"에 제공
     @Bean
     public AuthenticationManager authManager() {
@@ -65,6 +56,7 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
+        authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
 
         http.csrf(AbstractHttpConfigurer::disable)  // CSRF(Cross-Site Request Forgery) 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))
@@ -77,8 +69,7 @@ public class SecurityConfig {
             // 로그인 인증 설정
             .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
             // 로그아웃 설정
-            .logout(logout -> logout
-                .logoutUrl("/logout")
+            .logout(logout -> logout.logoutUrl("/logout")
                 .logoutSuccessHandler((req, res, authentication) ->
                         authStrategy.logout(req, res))
             );
@@ -88,7 +79,11 @@ public class SecurityConfig {
     }
 
 
-    // CORS 설정
+    /**
+     * ** CORS 설정 **
+     * UrlBasedCorsConfigurationSource : 특정 URL 패턴(/**)에 대해 CORS 설정을 적용
+     * /** : 모든 엔드포인트(URL)에 대해 CORS 규칙을 적용
+      */
     @Bean
     public CorsConfigurationSource corsSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
@@ -101,8 +96,6 @@ public class SecurityConfig {
                 "http://localhost:3306"
         ));
 
-        // UrlBasedCorsConfigurationSource : 특정 URL 패턴(/**)에 대해 CORS 설정을 적용
-        // /** : 모든 엔드포인트(URL)에 대해 CORS 규칙을 적용
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
         return source;
