@@ -17,7 +17,7 @@ public class PageResponseDto<E>{ // 페이징 결과 DTO
 
     private boolean prev, next; // 이전, 다음 페이지 존재 여부
 
-    private int totalCount, prevPage, nextPage, totalPage, currentPage;
+    private int totalCount, prevPage, nextPage, totalPage, current;
 
     @Builder
     public PageResponseDto(List<E> dtoList, List<Integer> pageNumList, PageRequestDto pageRequestDto, long total) {
@@ -26,9 +26,9 @@ public class PageResponseDto<E>{ // 페이징 결과 DTO
         this.totalCount = (int) total;
 
         // 현재 페이지
-        this.currentPage = pageRequestDto.getPage();
+        this.current = pageRequestDto.getPage();
 
-        int end = (int) (Math.ceil(currentPage / 10.0) * 10);
+        int end = (int) (Math.ceil(current / 10.0) * 10);
         int start = end - 9;
 
         // 전체 페이지 수
