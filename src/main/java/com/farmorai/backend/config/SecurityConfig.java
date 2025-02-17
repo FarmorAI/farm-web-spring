@@ -1,13 +1,23 @@
 package com.farmorai.backend.config;
 
+import com.farmorai.backend.dto.MemberRole;
+import com.farmorai.backend.securityFilter.AuthStrategy;
+import com.farmorai.backend.securityFilter.AuthenticationFilter;
+import com.farmorai.backend.service.MemberDetailsService;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,7 +30,10 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final AuthStrategy authStrategy;
+    private final MemberDetailsService memberDetailsService;
 
     // 비밀번호 단방향 암호화 인터페이스 (Bean 등록)
     @Bean
@@ -28,27 +41,49 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // "DaoAuthenticationProvider"는
+    // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고,
+    // "UsernamePasswordAuthentication" 객체를 만들어 "ProviderManager"에 제공
+    @Bean
+    public AuthenticationManager authManager() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(memberDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(authProvider);
+    }
 
     // 보안 필터 체인 (Bean 등록)
     @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // CSRF(Cross-Site Request Forgery) 비활성화
-        http.csrf(AbstractHttpConfigurer::disable)
+    protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
+        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
+        authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
+
+        http.csrf(AbstractHttpConfigurer::disable)  // CSRF(Cross-Site Request Forgery) 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))
-            // 권한에 따른 HTTP 요청 인가 설정
+            // HTTP 요청 인가 설정
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-//                        .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
-//                        .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
+                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
+                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
                     .anyRequest().permitAll()
             )
-            // 로그인 설정
-            .formLogin(AbstractHttpConfigurer::disable);
+            // 로그인 인증 설정
+            .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
+            // 로그아웃 설정
+            .logout(logout -> logout.logoutUrl("/logout")
+                .logoutSuccessHandler((req, res, authentication) ->
+                        authStrategy.logout(req, res))
+            );
 
+        authStrategy.configHttpSecurity(http);  // 전략별 추가 설정 적용
         return http.build();
     }
 
 
-    // CORS 설정
+    /**
+     * ** CORS 설정 **
+     * UrlBasedCorsConfigurationSource : 특정 URL 패턴(/**)에 대해 CORS 설정을 적용
+     * /** : 모든 엔드포인트(URL)에 대해 CORS 규칙을 적용
+      */
     @Bean
     public CorsConfigurationSource corsSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
@@ -57,10 +92,10 @@ public class SecurityConfig {
         corsConfig.addAllowedMethod("*");        // 모든 HTTP 메소드 허용
         corsConfig.setAllowedOrigins(List.of(    // 접근 허용할 URL 등록
                 "http://localhost:3030",
-                "http://localhost:9090"
+                "http://localhost:9090",
+                "http://localhost:3306"
         ));
-        // UrlBasedCorsConfigurationSource : 특정 URL 패턴(/**)에 대해 CORS 설정을 적용
-        // /** : 모든 엔드포인트(URL)에 대해 CORS 규칙을 적용
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
         return source;

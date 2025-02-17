@@ -31,17 +31,22 @@ public class MemberController {
     @ResponseBody
     @PostMapping(value = "/join")
     public String addMember(@RequestBody MemberDto memberDto) {
-        memberDto.setMemberRole(MemberRole.USER);
         memberService.insertMember(memberDto);
         return "success";
     }
 
-    // 회원 조회
+    // 회원 조회 (by id)
     @ResponseBody
     @GetMapping(value = "/auth/{memberId}")
     public MemberDto getMemberById(@PathVariable(value = "memberId") Long memberId) {
-        System.out.println(memberId);
         return memberService.getMemberById(memberId);
+    }
+
+    // 회원 조회 (by email)
+    @ResponseBody
+    @GetMapping(value = "/auth/{email}")
+    public MemberDto getMemberByEmail(@PathVariable(value = "email") String email) {
+        return memberService.getMemberByEmail(email);
     }
 
     // 회원 수정
@@ -67,29 +72,5 @@ public class MemberController {
     public String deleteMember(@PathVariable(value = "memberId") Long memberId) {
         memberService.deleteMember(memberId);
         return "success";
-    }
-
-
-    @ResponseBody
-    @PostMapping("/login")
-    public String login(@RequestBody Map<String, String> loginInfo) {
-        // 로그인 정보 { "email": "", "password": "" }
-        log.info("loginInfo: {}", loginInfo);
-        String email = loginInfo.get("email");
-        String password = loginInfo.get("password");
-        MemberDto memberDto = memberService.getMemberByEmail(email);
-
-        if(memberDto.getPassword().equals(password)) {
-            return "Login Success";
-        } else {
-            return "Login Failed";
-        }
-    }
-
-    // 로그아웃
-    @ResponseBody
-    @GetMapping("/auth/logout")
-    public String logout() {
-        return "Logout";
     }
 }
