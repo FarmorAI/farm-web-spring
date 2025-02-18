@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.NoticeMapper">
+    <select id="getNoticeList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.NoticeDto">
+        SELECT * FROM notice
+        <where>
+            1=1
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+        ORDER BY notice_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="getNoticeListCount" parameterType="Map" resultType="int">
+        SELECT COUNT(*) FROM notice
+        <where>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getNoticeDetail" parameterType="Long" resultType="com.farmorai.backend.dto.NoticeDto">
+        SELECT notice_id ,title, writer ,content, views, created_at, updated_at  FROM notice WHERE notice_id = #{noticeId}
+    </select>
+
+    <update id="updateNoticeViews" parameterType="Long">
+        UPDATE notice SET views = views + 1 WHERE notice_id = #{noticeId}
+    </update>
+
+    <insert id="insertNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
+        INSERT INTO notice (title, content, writer, created_at, updated_at) VALUES (#{title}, #{content}, #{writer}, now(),now())
+    </insert>
+
+    <update id="updateNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
+        UPDATE notice SET title = #{notice.title}, content = #{notice.content}, updated_at = now() WHERE notice_id = #{noticeId}
+    </update>
+
+    <delete id="deleteNotice" parameterType="Long">
+        DELETE FROM notice WHERE notice_id = #{noticeId}
+    </delete>
+</mapper>

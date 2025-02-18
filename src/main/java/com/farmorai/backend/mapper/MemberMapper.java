@@ -2,6 +2,7 @@ package com.farmorai.backend.mapper;
 
 import com.farmorai.backend.dto.MemberDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
