@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class BoardDto {
-    private Long board_id;
+    private Long boardId;
     private String title;
     private String content;
     private int views;
-    private String created_at;
-    private String updated_at;
+    private String createdAt;
+    private String updatedAt;
 }
