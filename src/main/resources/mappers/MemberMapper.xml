@@ -4,10 +4,6 @@
 
 <mapper namespace="com.farmorai.backend.mapper.MemberMapper">
 
-    <!-- 전체 회원 조회 -->
-    <select id="getAllMember" resultMap="memberResult">
-        SELECT * FROM member
-    </select>
     <!-- MemberDto Mapping -->
     <resultMap id="memberResult" type="com.farmorai.backend.dto.MemberDto">
         <result property="memberId" column="member_id" />
@@ -24,14 +20,22 @@
     </resultMap>
 
 
+    <!-- 전체 회원 조회 -->
+    <select id="getAllMember" resultMap="memberResult">
+        SELECT member_id, email, password, name, nickname, phone, birth_date,
+            member_role, address, created_at, updated_at FROM member
+    </select>
+
     <!-- 회원 조회 by ID -->
     <select id="getMemberById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.MemberDto">
-        SELECT * FROM member WHERE member_id = #{memberId}
+        SELECT member_id, email, password, name, nickname, phone, birth_date,
+            member_role, address, created_at, updated_at FROM member WHERE member_id = #{memberId}
     </select>
 
     <!-- 회원 조회 by Email -->
     <select id="getMemberByEmail" parameterType="String" resultType="com.farmorai.backend.dto.MemberDto">
-        SELECT * FROM member WHERE email = #{email}
+        SELECT member_id, email, password, name, nickname, phone, birth_date,
+            member_role, address, created_at, updated_at FROM member WHERE email = #{email}
     </select>
 
 
@@ -45,13 +49,13 @@
     <!-- 회원 수정 -->
     <update id="updateMember" parameterType="com.farmorai.backend.dto.MemberDto">
         UPDATE member SET
-            email = #{email},
-            password = #{password},
-            name = #{name},
-            nickname = #{nickname},
-            phone = #{phone},
+            email      = #{email},
+            password   = #{password},
+            name       = #{name},
+            nickname   = #{nickname},
+            phone      = #{phone},
             birth_date = #{birthDate},
-            address = #{address}
+            address    = #{address}
         WHERE member_id = #{memberId}
     </update>
 
