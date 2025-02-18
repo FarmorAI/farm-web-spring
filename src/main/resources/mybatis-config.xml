@@ -9,7 +9,7 @@
         <!-- xml문서의 물리적인 위치와 파일명을 등록 -->
         <mapper resource="mappers/MemberMapper.xml" />
         <mapper resource="mappers/NoticeMapper.xml"/>
-        <mapper resource="mappers/BoardMapper.xml" />
-        <mapper resource="mappers/CommentMapper.xml" />
+
+
     </mappers>
 </configuration>
