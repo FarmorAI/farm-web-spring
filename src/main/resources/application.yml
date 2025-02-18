@@ -14,6 +14,7 @@ spring:
 
   datasource:
     hikari:
+
       jdbc-url: jdbc:mysql://localhost:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
@@ -36,8 +37,11 @@ spring:
     expiration: 3600000  # jwt 유효시간
 
 mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
   mapper-locations: classpath:/mappers/**/*.xml
   config-location: classpath:/mybatis-config.xml
+
 
 # 파일 업로드 경로
 com:
