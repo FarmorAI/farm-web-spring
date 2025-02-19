@@ -1,4 +1,4 @@
-package com.farmorai.backend;
+package com.farmorai.backend.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -43,6 +43,12 @@ public class DatabaseConfig {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:/mappers/**/*.xml"));
+
+        // MyBatis 설정 직접 추가
+        org.apache.ibatis.session.Configuration mybatisConfig = new org.apache.ibatis.session.Configuration();
+        mybatisConfig.setMapUnderscoreToCamelCase(true);
+
+        sqlSessionFactoryBean.setConfiguration(mybatisConfig);
         return sqlSessionFactoryBean.getObject();
     }
 

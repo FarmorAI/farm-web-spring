@@ -1,0 +1,50 @@
+package com.farmorai.backend.mapper;
+
+import com.farmorai.backend.dto.SubsDto;
+import com.farmorai.backend.dto.SubsStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@Transactional
+class SubsMapperTest {
+
+    @Autowired
+    private SubsMapper subsMapper;
+
+    private SubsDto testDto;
+
+    @BeforeEach
+    void setUp() {
+        testDto = new SubsDto(
+                null,
+                SubsStatus.ACTIVE,
+                "2025-03-01 00:00:00",
+                "2025-03-30 23:59:59",
+                null,
+                null,
+                1,
+                1
+        );
+    }
+
+    @Test
+    @DisplayName("DB연동_조회_삽입_테스트")
+    void getAllMemberTest() {
+        // 결제 내역 확인
+        List<SubsDto> subs = subsMapper.getAllSubs();
+        subsMapper.insertSubs(testDto);
+        List<SubsDto> subs2 = subsMapper.getAllSubs();
+
+        // 검증
+        assertThat(subs2.size()).isEqualTo(subs.size() + 1);
+    }
+}
