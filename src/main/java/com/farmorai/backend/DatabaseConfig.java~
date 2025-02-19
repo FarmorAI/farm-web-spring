@@ -44,11 +44,11 @@ public class DatabaseConfig {
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:/mappers/**/*.xml"));
 
-        // MyBatis 설정 직접 추가
-        org.apache.ibatis.session.Configuration mybatisConfig = new org.apache.ibatis.session.Configuration();
+        // ✅ MyBatis 설정 직접 추가
+        Configuration mybatisConfig = new Configuration();
         mybatisConfig.setMapUnderscoreToCamelCase(true);
-
         sqlSessionFactoryBean.setConfiguration(mybatisConfig);
+
         return sqlSessionFactoryBean.getObject();
     }
 
