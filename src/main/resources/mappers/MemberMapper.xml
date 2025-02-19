@@ -42,7 +42,7 @@
     <!-- 회원 등록 -->
     <insert id="insertMember" parameterType="com.farmorai.backend.dto.MemberDto">
         INSERT INTO member (email, password, name, nickname, phone, birth_date, member_role, address, created_at, updated_at)
-        VALUES (#{email}, #{password}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now())
+            VALUES (#{email}, #{password}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now())
     </insert>
 
 
