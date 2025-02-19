@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MyBatis 매퍼 파일의 루트 태그. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.SubsMapper">
+    <select id="getAllSubs" resultType="com.farmorai.backend.dto.SubsDto">
+        SELECT * FROM Subscription
+    </select>
+
+    <insert id="insertSubs" parameterType="com.farmorai.backend.dto.SubsDto">
+        INSERT INTO Subscription (status, start_date, end_date, member_id, plan_id)
+            VALUES (#{status}, #{startDate}, #{endDate}, #{memberId}, #{planId})
+    </insert>
+</mapper>

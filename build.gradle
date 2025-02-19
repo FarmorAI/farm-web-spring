@@ -45,6 +45,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'  // WebClient 사용을 위해 필수
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'net.coobird:thumbnailator:0.4.19'
