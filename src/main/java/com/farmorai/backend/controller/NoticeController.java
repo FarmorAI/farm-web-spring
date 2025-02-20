@@ -29,7 +29,6 @@ public class NoticeController {
         return noticeService.getNoticeDetail(noticeId);
     }
 
-
     @PostMapping
     public Map<String,String> insertNotice(@RequestBody NoticeDto noticeDto) {
 
@@ -48,9 +47,4 @@ public class NoticeController {
         noticeService.deleteNotice(noticeId);
         return Map.of("result","success");
     }
-
-
-
-
-
 }

@@ -1,9 +1,7 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
-import com.farmorai.backend.dto.MemberRole;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.farmorai.backend.service.MemberService;
@@ -14,21 +12,19 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
     // 전체 회원 조회
-    @ResponseBody
     @GetMapping(value = "/admin/members")
     public List<MemberDto> getAllMember() {
         return memberService.getAllMember();
     }
 
     // 회원 등록
-    @ResponseBody
     @PostMapping(value = "/join")
     public String addMember(@RequestBody MemberDto memberDto) {
         memberService.insertMember(memberDto);
@@ -36,21 +32,18 @@ public class MemberController {
     }
 
     // 회원 조회 (by id)
-    @ResponseBody
     @GetMapping(value = "/auth/{memberId}")
     public MemberDto getMemberById(@PathVariable(value = "memberId") Long memberId) {
         return memberService.getMemberById(memberId);
     }
 
     // 회원 조회 (by email)
-    @ResponseBody
     @GetMapping(value = "/auth/{email}")
     public MemberDto getMemberByEmail(@PathVariable(value = "email") String email) {
         return memberService.getMemberByEmail(email);
     }
 
     // 회원 수정
-    @ResponseBody
     @PutMapping(value = "/auth/{memberId}")
     public String updateMember(
             @PathVariable(value = "memberId") Long memberId,
@@ -67,7 +60,6 @@ public class MemberController {
     }
 
     // 회원 삭제
-    @ResponseBody
     @DeleteMapping(value = "/auth/{memberId}")
     public String deleteMember(@PathVariable(value = "memberId") Long memberId) {
         memberService.deleteMember(memberId);

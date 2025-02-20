@@ -45,12 +45,9 @@ fastapi:
   server:
     url: http://localhost:9090
 
-
-# 네이버페이 결제
+# 네이버 페이
 naver:
   pay:
-    client:
-      id: HN3GGCMDdTgGUfl0kFCo
-      secret: ftZjkkRNMR
-    chain:
-      id: UUxQWHhsWEVra3R
+    client-id: HN3GGCMDdTgGUfl0kFCo
+    client-secret: ftZjkkRNMR
+    chain-id: UUxQWHhsWEVra3R
