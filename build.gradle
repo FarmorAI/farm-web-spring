@@ -24,8 +24,14 @@ repositories {
 }
 
 dependencies {
-	// Spring Security
+	// .env for Spring
+	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+
+	// Spring Security & JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	// Database
 	runtimeOnly 'com.h2database:h2'
@@ -39,6 +45,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'  // WebClient 사용을 위해 필수
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'net.coobird:thumbnailator:0.4.19'
