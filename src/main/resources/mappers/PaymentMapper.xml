@@ -7,8 +7,18 @@
         SELECT * FROM Payment
     </select>
 
+    <select id="getPaymentById" parameterType="Map" resultType="com.farmorai.backend.dto.PaymentDto">
+        SELECT * FROM Payment
+        <where>
+            member_id = #{memberId} AND subs_id = #{subsId}
+        </where>
+
+    </select>
+
     <insert id="insertPayment" parameterType="com.farmorai.backend.dto.PaymentDto">
         INSERT INTO Payment (amount, token, payment_method, status, plan_id, member_id, subs_id)
             VALUES (#{amount}, #{token}, #{paymentMethod}, #{status}, #{planId}, #{memberId}, #{subsId})
     </insert>
+
+
 </mapper>

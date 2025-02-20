@@ -1,8 +1,12 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.NaverPayInfoDto;
+import com.farmorai.backend.dto.PaymentDto;
+import com.farmorai.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
+    private final WebClient webClient;
+    private final PaymentService paymentService;
+
+    @Autowired
+    public PaymentController(PaymentService paymentService, WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("https://dev-pub.apis.naver.com").build();
+        this.paymentService = paymentService;
+    }
 
     @Value("${naver.pay.client-id}")
     private String naverPayClientId;
@@ -29,11 +41,6 @@ public class PaymentController {
     @Value("${naver.pay.chain-id}")
     private String naverPayChainId;
 
-    private final WebClient webClient;
-
-    public PaymentController(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://dev-pub.apis.naver.com").build();
-    }
 
     @PostMapping("/naverpay")
     public Mono<ResponseEntity<?>> naverPayReserve(@RequestBody Map<String, String> reqBody) {
@@ -45,6 +52,10 @@ public class PaymentController {
             return Mono.fromSupplier(() -> ResponseEntity.badRequest().body("Missing required parameters"));
         }
 
+        // paymentDto 객체 생성
+        PaymentDto paymentDto = paymentService.insertPayment("admin@admin.com", subsPlan, subsPrice);
+
+        // NaverPay API 요청 정보
         NaverPayInfoDto payInfo = NaverPayInfoDto.builder()
                 .merchantPayKey(UUID.randomUUID().toString())
                 .productName(subsPlan)

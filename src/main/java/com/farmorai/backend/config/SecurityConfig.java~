@@ -90,7 +90,9 @@ public class SecurityConfig {
         corsConfig.setAllowCredentials(true);    // 쿠키 및 인증 정보(세션, 토큰 등) 전송을 허용하는 설정
         corsConfig.addAllowedHeader("*");        // 모든 HTTP 헤더 허용
         corsConfig.addAllowedMethod("*");        // 모든 HTTP 메소드 허용
-        corsConfig.setAllowedOriginPatterns(List.of("*")); // 모든 도메인 허용
+        corsConfig.setAllowedOriginPatterns(List.of(
+                "*"
+        )); // 모든 도메인 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
