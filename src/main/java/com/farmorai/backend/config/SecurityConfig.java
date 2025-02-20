@@ -53,6 +53,7 @@ public class SecurityConfig {
     }
 
     // 보안 필터 체인 (Bean 등록)
+    @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
         authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
@@ -91,8 +92,9 @@ public class SecurityConfig {
         corsConfig.addAllowedMethod("*");        // 모든 HTTP 메소드 허용
         corsConfig.setAllowedOrigins(List.of(    // 접근 허용할 URL 등록
                 "http://localhost:3030",
+                "http://localhost:6060",
                 "http://localhost:9090",
-                "http://localhost:3306"
+                "http://192.168.0.4:3306"
         ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

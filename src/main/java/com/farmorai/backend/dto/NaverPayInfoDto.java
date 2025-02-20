@@ -1,4 +1,4 @@
-package com.farmorai.backend.service;
+package com.farmorai.backend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NaverPayReserveRequest {
+public class NaverPayInfoDto {
     private String merchantPayKey;
     private String productName;
     private int productCount;
