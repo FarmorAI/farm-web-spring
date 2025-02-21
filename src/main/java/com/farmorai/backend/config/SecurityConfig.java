@@ -58,17 +58,19 @@ public class SecurityConfig {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
         authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
 
-        http.csrf(AbstractHttpConfigurer::disable)  // CSRF(Cross-Site Request Forgery) 비활성화
+        http.csrf((auth) -> auth.disable())  // CSRF(Cross-Site Request Forgery) 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))
-            // HTTP 요청 인가 설정
+            .formLogin((auth) -> auth.disable())
+            .httpBasic((auth) -> auth.disable())
+            // HTTP 요청 경로별 인가 설정
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                     .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
                     .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
                     .anyRequest().permitAll()
             )
-            // 로그인 인증 설정
+            // Login 설정
             .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
-            // 로그아웃 설정
+            // Logout 설정
             .logout(logout -> logout.logoutUrl("/logout")
                 .logoutSuccessHandler((req, res, authentication) ->
                         authStrategy.logout(req, res))

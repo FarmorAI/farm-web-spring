@@ -12,5 +12,9 @@ public interface PaymentMapper {
 
     void insertPayment(PaymentDto paymentDto);
 
-    List<PaymentDto> getPaymentById(PaymentDto paymentDto);
+    PaymentDto getPaymentById(Long paymentId);
+
+    void updatePayment(PaymentDto paymentDto);
+
+    void refundPayment(String token);
 }
