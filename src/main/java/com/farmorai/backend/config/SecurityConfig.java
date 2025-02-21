@@ -53,6 +53,7 @@ public class SecurityConfig {
     }
 
     // 보안 필터 체인 (Bean 등록)
+    @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
         authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
