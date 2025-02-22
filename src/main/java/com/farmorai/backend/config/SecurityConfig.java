@@ -8,17 +8,17 @@ import com.farmorai.backend.service.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -55,27 +55,16 @@ public class SecurityConfig {
 
     // 보안 필터 체인 (Bean 등록)
     @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
-        authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
-
-        http.csrf((auth) -> auth.disable())  // CSRF(Cross-Site Request Forgery) 비활성화
-            .cors(cors -> cors.configurationSource(corsSource()))
+    protected SecurityFilterChain filterChain(
+            HttpSecurity http, AuthenticationManager authManager
+    ) throws Exception {
+        http.csrf((auth) -> auth.disable())                            // CSRF 비활성화
+            .cors(cors -> cors.configurationSource(corsSource()))      // CORS 설정 활성화
             .formLogin((auth) -> auth.disable())
             .httpBasic((auth) -> auth.disable())
-            // HTTP 요청 경로별 인가 설정
-            .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-//                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
-//                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
-                    .anyRequest().permitAll()
-            )
-            // Login 설정
-            .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
-            // Logout 설정
-            .logout(logout -> logout.logoutUrl("/logout")
-                .logoutSuccessHandler((req, res, authentication) ->
-                        authStrategy.logout(req, res))
-            );
+            .authorizeHttpRequests(this::configAuthHttpReq)                                    // HTTP 요청 경로별 인가 설정
+            .addFilterAt(authFilter(authManager), UsernamePasswordAuthenticationFilter.class)  // Login 설정
+            .logout(this::configLogout);                                                       // Logout 설정
 
         authStrategy.configHttpSecurity(http);  // 전략별 추가 설정 적용
         return http.build();
@@ -83,11 +72,26 @@ public class SecurityConfig {
 
 
     // HTTP 요청 경로별 인가 설정
-    private void configAuth(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
+    private void configAuthHttpReq(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
         authz
             .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.name())
             .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.name(), MemberRole.USER.name())
             .anyRequest().permitAll();
+    }
+
+    // login 설정
+    private AuthenticationFilter authFilter(AuthenticationManager authManager) {
+        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
+        authFilter.setFilterProcessesUrl("/login");
+        return authFilter;
+    }
+
+    // logout 설정
+    private void configLogout(LogoutConfigurer<HttpSecurity> logout) {
+        logout
+            .logoutUrl("/logout")
+            .logoutSuccessHandler((req, res, authentication) ->
+                    authStrategy.logout(req, res));
     }
 
 
