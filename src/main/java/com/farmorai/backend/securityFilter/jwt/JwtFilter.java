@@ -9,11 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -34,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Request -> "Authorization" Header -> Return JWT
+        // "Request"의 Header:"Authorization"을 찾아 "JWT"를 반환
         String token = resolveToken(req);
 
         // JWT 존재 여부 확인
@@ -70,9 +68,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // "Authorization" Header 검증
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            return authorization.split(" ")[1];
+            return null;
         }
-        return null;
+        return authorization.split(" ")[1];
     }
 
 
