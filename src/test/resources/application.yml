@@ -14,7 +14,7 @@ spring:
 
   datasource:
     hikari:
-      jdbc-url: ${DB_URL}
+      jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -46,11 +46,9 @@ fastapi:
     url: http://localhost:9090
 
 
-# 네이버페이 결제
+# 네이버 페이
 naver:
   pay:
-    client:
-      id: HN3GGCMDdTgGUfl0kFCo
-      secret: ftZjkkRNMR
-    chain:
-      id: UUxQWHhsWEVra3R
+    client-id: ${NAVERPAY_CLIENT_ID}
+    client-secret: ${NAVERPAY_CLIENT_SECRET}
+    chain-id: ${NAVERPAY_CHAIN_ID}
