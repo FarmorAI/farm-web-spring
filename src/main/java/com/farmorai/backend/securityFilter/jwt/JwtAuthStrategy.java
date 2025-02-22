@@ -20,13 +20,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @ConditionalOnProperty : spring.auth.strategy 값(jwt)에 따라 Bean 등록 여부를 동적으로 결정
+ * @ConditionalOnProperty
+ * : spring.auth.strategy 값(jwt)에 따라 Bean 등록 여부를 동적으로 결정
  */
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.auth.strategy", havingValue = "jwt")
 public class JwtAuthStrategy implements AuthStrategy {
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 인증이 성공했을 때, 실행되는 메서드
