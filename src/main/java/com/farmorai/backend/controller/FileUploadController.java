@@ -106,6 +106,22 @@ public class FileUploadController {
         return fileUploadUtil.getFile(fileName);
     }
 
+    /*
+    * 파일 목록 조회 API
+    * */
+    @GetMapping("/files")
+    public ResponseEntity<List<String>> getUploadedFiles() {
+        File folder = new File(uploadPath);
+        String[] fileNames = folder.list();
+
+        if (fileNames == null || fileNames.length == 0) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(List.of());
+        }
+
+        return ResponseEntity.ok(List.of(fileNames));
+    }
+
+
     /**
      * 파일 삭제 API
      */

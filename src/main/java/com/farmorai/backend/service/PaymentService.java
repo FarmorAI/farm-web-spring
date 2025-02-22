@@ -1,40 +1,56 @@
 package com.farmorai.backend.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.farmorai.backend.dto.*;
+import com.farmorai.backend.mapper.MemberMapper;
+import com.farmorai.backend.mapper.PaymentMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
+    private final PaymentMapper paymentMapper;
+    private final MemberMapper memberMapper;
 
-//    @Value("${naver.pay.client.id}")
-//    private String clientId;
-//
-//    @Value("${naver.pay.client.secret}")
-//    private String clientSecret;
-//
-//    @Value("${naver.pay.chain.id}")
-//    private String chainId;
-//
-//    // WebClient는 비동기 방식으로 HTTP 요청을 처리하는 Spring WebFlux의 HTTP 클라이언트
-//    private final WebClient webClient;
-//
-//    public PaymentService(WebClient.Builder webClientBuilder) {
-//        this.webClient = webClientBuilder.baseUrl("https://dev-pub.apis.naver.com").build();
-//    }
+    // PaymentDto 조회
+    public PaymentDto getPaymentById(Long paymentId) {
+        PaymentDto paymentDto = paymentMapper.getPaymentById(paymentId);
+        return paymentDto;
+    }
 
+    // PENDING : PaymentDto 생성 및 레코드 저장
+    public PaymentDto insertPayment(String email, String subsPlan, String subsPrice) {
+        MemberDto memberDto = memberMapper.getMemberByEmail(email);
+        Long planId = (long) PaymentPlan.valueOf(subsPlan).ordinal();
 
+        PaymentDto paymentDto = new PaymentDto(
+                null,
+                Integer.parseInt(subsPrice),
+                null,
+                null,
+                PaymentMethod.NAVERPAY,
+                PaymentStatus.PENDING,
+                planId,
+                memberDto.getMemberId(),
+                null
+        );
 
-//    public Mono<NaverPayReserveResponse> reservePayment(NaverPayReserveRequest payInfo) {
-//        return webClient.post()
-//                .uri("/naverpay-partner/naverpay/payments/v2/reserve")
-//                .header("X-Naver-Client-Id", clientId)
-//                .header("X-Naver-Client-Secret", clientSecret)
-//                .header("X-NaverPay-Chain-Id", chainId)
-//                .header("X-NaverPay-Idempotency-Key", UUID.randomUUID().toString())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(payInfo)
-//                .retrieve()
-//                .bodyToMono(NaverPayReserveResponse.class);
-//    }
+        paymentMapper.insertPayment(paymentDto);
+        return paymentDto;
+    }
+
+    // Payment 레코드 저장 (Completed)
+    public void updatePayment(PaymentDto paymentDto, String paymentId, Long subsId) {
+        paymentDto.setToken(paymentId);
+        paymentDto.setStatus(PaymentStatus.COMPLETED);
+        paymentDto.setSubsId(subsId);
+        paymentMapper.updatePayment(paymentDto);
+    }
+
+    // Payment Update
+    public void refundPayment(String token) {
+        paymentMapper.refundPayment(token);
+    }
 }
