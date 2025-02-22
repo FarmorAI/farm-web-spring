@@ -1,11 +1,8 @@
 package com.farmorai.backend.service;
 
 import com.farmorai.backend.dto.MemberDto;
-import com.farmorai.backend.dto.MemberRole;
 import com.farmorai.backend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +11,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberMapper memberMapper;
-    private final PasswordEncoder passwordEncoder;
 
     // 전체 회원 조회
     public List<MemberDto> getAllMember() {
@@ -33,9 +29,6 @@ public class MemberService {
 
     // 회원 등록
     public void insertMember(MemberDto memberDto) {
-        String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
-        memberDto.setPassword(encodedPassword);
-        memberDto.setMemberRole(MemberRole.USER);
         memberMapper.insertMember(memberDto);
     }
 

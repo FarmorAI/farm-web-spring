@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NoticeDto {
 
-    private Long noticeId;
+    private Long notice_no;
 
     private String title;
 
@@ -20,11 +20,9 @@ public class NoticeDto {
 
     private String writer;
 
-    private int views;
+    private String created_at;
 
-    private String createdAt;
-
-    private String updatedAt;
+    private String modified_at;
 
 
 }
