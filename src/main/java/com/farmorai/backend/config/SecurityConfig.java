@@ -8,12 +8,13 @@ import com.farmorai.backend.service.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -45,11 +46,11 @@ public class SecurityConfig {
     // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고,
     // "UsernamePasswordAuthentication" 객체를 만들어 "ProviderManager"에 제공
     @Bean
-    public AuthenticationManager authManager() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(memberDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authProvider);
+    public AuthenticationManager authManager(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider DaoAuthProvider = new DaoAuthenticationProvider();
+        DaoAuthProvider.setUserDetailsService(memberDetailsService);
+        DaoAuthProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(DaoAuthProvider);
     }
 
     // 보안 필터 체인 (Bean 등록)
@@ -64,8 +65,8 @@ public class SecurityConfig {
             .httpBasic((auth) -> auth.disable())
             // HTTP 요청 경로별 인가 설정
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
-                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
+//                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
+//                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
                     .anyRequest().permitAll()
             )
             // Login 설정
@@ -78,6 +79,15 @@ public class SecurityConfig {
 
         authStrategy.configHttpSecurity(http);  // 전략별 추가 설정 적용
         return http.build();
+    }
+
+
+    // HTTP 요청 경로별 인가 설정
+    private void configAuth(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
+        authz
+            .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.name())
+            .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.name(), MemberRole.USER.name())
+            .anyRequest().permitAll();
     }
 
 

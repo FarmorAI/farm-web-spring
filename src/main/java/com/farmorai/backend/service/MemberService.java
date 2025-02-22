@@ -41,4 +41,14 @@ public class MemberService {
     public void deleteMember(Long memberId) {
         memberMapper.deleteMember(memberId);
     }
+
+    // 닉네임 중복 검사
+    public boolean checkNickname(String nickname) {
+        return memberMapper.checkNickname(nickname);
+    }
+
+    // 이메일 중복 검사
+    public boolean checkEmail(String email) {
+        return memberMapper.checkEmail(email);
+    }
 }

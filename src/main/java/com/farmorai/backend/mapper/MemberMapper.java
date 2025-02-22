@@ -18,4 +18,8 @@ public interface MemberMapper {
     void updateMember(MemberDto memberDto);
 
     void deleteMember(Long memberId);
+
+    boolean checkNickname(String nickname);
+
+    boolean checkEmail(String email);
 }
