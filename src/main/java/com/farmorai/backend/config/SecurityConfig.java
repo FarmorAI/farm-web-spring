@@ -58,17 +58,19 @@ public class SecurityConfig {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
         authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
 
-        http.csrf(AbstractHttpConfigurer::disable)  // CSRF(Cross-Site Request Forgery) 비활성화
+        http.csrf((auth) -> auth.disable())  // CSRF(Cross-Site Request Forgery) 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))
-            // HTTP 요청 인가 설정
+            .formLogin((auth) -> auth.disable())
+            .httpBasic((auth) -> auth.disable())
+            // HTTP 요청 경로별 인가 설정
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                     .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
                     .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
                     .anyRequest().permitAll()
             )
-            // 로그인 인증 설정
+            // Login 설정
             .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
-            // 로그아웃 설정
+            // Logout 설정
             .logout(logout -> logout.logoutUrl("/logout")
                 .logoutSuccessHandler((req, res, authentication) ->
                         authStrategy.logout(req, res))
@@ -109,13 +111,7 @@ public class SecurityConfig {
         corsConfig.setAllowCredentials(true);    // 쿠키 및 인증 정보(세션, 토큰 등) 전송을 허용하는 설정
         corsConfig.addAllowedHeader("*");        // 모든 HTTP 헤더 허용
         corsConfig.addAllowedMethod("*");        // 모든 HTTP 메소드 허용
-        corsConfig.setAllowedOrigins(List.of(    // 접근 허용할 URL 등록
-                "http://localhost:3030",
-                "http://localhost:9090",
-                "http://localhost:3306",
-                "http://192.168.0.4:3306",
-                "http://localhost:6060"
-        ));
+        corsConfig.setAllowedOriginPatterns(List.of("*")); // 모든 도메인 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);

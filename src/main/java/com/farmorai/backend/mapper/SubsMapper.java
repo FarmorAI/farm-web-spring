@@ -10,4 +10,6 @@ public interface SubsMapper {
     List<SubsDto> getAllSubs();
 
     void insertSubs(SubsDto subsDto);
+
+    void cancelSubs(String token);
 }

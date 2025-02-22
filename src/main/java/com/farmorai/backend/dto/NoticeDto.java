@@ -24,7 +24,7 @@ public class NoticeDto {
 
     private String createdAt;
 
-    private String updatedAt;
+    private String modifiedAt;
 
 
 }

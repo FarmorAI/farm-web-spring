@@ -7,8 +7,24 @@
         SELECT * FROM Payment
     </select>
 
-    <insert id="insertPayment" parameterType="com.farmorai.backend.dto.PaymentDto">
+    <select id="getPaymentById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.PaymentDto">
+        SELECT * FROM Payment WHERE payment_id = #{paymentId}
+    </select>
+
+    <insert id="insertPayment" parameterType="com.farmorai.backend.dto.PaymentDto" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO Payment (amount, token, payment_method, status, plan_id, member_id, subs_id)
             VALUES (#{amount}, #{token}, #{paymentMethod}, #{status}, #{planId}, #{memberId}, #{subsId})
     </insert>
+
+    <update id="updatePayment" parameterType="Map">
+        UPDATE Payment SET
+            token = #{token},
+            status = #{status},
+            subs_id = #{subsId}
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <update id="refundPayment" parameterType="string">
+        UPDATE payment SET status = 'REFUNDED' WHERE token = #{token}
+    </update>
 </mapper>

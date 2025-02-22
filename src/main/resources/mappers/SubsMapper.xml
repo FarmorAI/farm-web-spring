@@ -7,8 +7,19 @@
         SELECT * FROM Subscription
     </select>
 
-    <insert id="insertSubs" parameterType="com.farmorai.backend.dto.SubsDto">
+    <select id="getSubsById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.SubsDto">
+        SELECT * FROM Payment WHERE subs_id = #{subsId}
+    </select>
+
+    <insert id="insertSubs" parameterType="com.farmorai.backend.dto.SubsDto" useGeneratedKeys="true" keyProperty="subsId">
         INSERT INTO Subscription (status, start_date, end_date, member_id, plan_id)
             VALUES (#{status}, #{startDate}, #{endDate}, #{memberId}, #{planId})
     </insert>
+
+    <update id="cancelSubs" parameterType="string">
+        UPDATE subscription s
+        LEFT JOIN payment p ON s.subs_id = p.subs_id
+        SET s.status = 'CANCELED'
+        WHERE p.token = #{token};
+    </update>
 </mapper>
