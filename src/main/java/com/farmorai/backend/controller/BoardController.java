@@ -3,6 +3,7 @@ package com.farmorai.backend.controller;
 import com.farmorai.backend.dto.BoardDto;
 import com.farmorai.backend.service.BoardService;
 import com.farmorai.backend.util.FileUploadUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +27,10 @@ public class BoardController {
     private String uploadPath;
 
     @GetMapping
-    public List<BoardDto> getBoardList(){
-        return boardService.getBoardList();
+    public Map<String, Object> getBoardList(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return boardService.getBoardList(page, size);
     }
 
     @GetMapping("/{boardId}")
@@ -34,29 +38,40 @@ public class BoardController {
         return boardService.getBoardDetail(boardId);
     }
 
+
     @PostMapping
     public Map<String, Object> insertBoard(
-            @RequestPart("board") BoardDto boardDto,
+            @RequestParam("board") String boardJson,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
         try {
-            List<String> fileNames = null;
+            // JSON을 DTO로 변환
+            ObjectMapper objectMapper = new ObjectMapper();
+            BoardDto boardDto = objectMapper.readValue(boardJson, BoardDto.class);
 
+            // 파일 저장
+            List<String> fileNames = new ArrayList<>();
             if (files != null && !files.isEmpty()) {
-                fileNames = fileUploadUtil.saveFiles(files); // 다중 파일 업로드
+                fileNames = fileUploadUtil.saveFiles(files);
             }
 
-            boardService.insertBoard(boardDto); // 게시글 데이터 저장 (파일 정보는 저장하지 않음)
+            // 게시글 데이터 저장
+            boardService.insertBoard(boardDto);
 
+            // 응답 데이터 반환 (fileNames이 null이면 빈 리스트로 초기화)
             return Map.of(
                     "result", "success",
-                    "uploadedFiles", fileNames // 업로드된 파일명 반환
+                    "uploadedFiles", fileNames != null ? fileNames : new ArrayList<>()
             );
+        } catch (IOException e) {
+            log.error("Failed to parse board JSON", e);
+            return Map.of("result", "fail", "message", "Invalid board data");
         } catch (RuntimeException e) {
             log.error("File upload failed", e);
             return Map.of("result", "fail", "message", e.getMessage());
         }
     }
+
 
     @DeleteMapping("/{boardId}")
     public Map<String,String> deleteBoard(@PathVariable Long boardId){
