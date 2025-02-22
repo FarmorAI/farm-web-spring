@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/notice")
+@RequestMapping("/notice")
 public class NoticeController {
 
     private final NoticeService noticeService;
@@ -20,7 +20,6 @@ public class NoticeController {
     public List<NoticeDto> getNoticeList() {
         return noticeService.getNoticeList();
     }
-
 
     @PostMapping
     public Map<String,String> insertNotice(@RequestBody NoticeDto noticeDto) {
@@ -33,9 +32,4 @@ public class NoticeController {
         noticeService.deleteNotice(notice_no);
         return Map.of("result","success");
     }
-
-
-
-
-
 }
