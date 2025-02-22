@@ -53,6 +53,7 @@ public class SecurityConfig {
     }
 
     // 보안 필터 체인 (Bean 등록)
+    @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
         authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
@@ -77,6 +78,25 @@ public class SecurityConfig {
         return http.build();
     }
 
+//    @Bean
+//    protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
+//        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
+//        authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
+//
+//        http.csrf(AbstractHttpConfigurer::disable)  // CSRF 비활성화
+//                .cors(cors -> cors.configurationSource(corsSource())) // CORS 허용
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .anyRequest().permitAll()  // 🔹 모든 요청을 허용
+//                )
+//                .logout(logout -> logout.logoutUrl("/logout")
+//                        .logoutSuccessHandler((req, res, authentication) ->
+//                                authStrategy.logout(req, res))
+//                );
+//
+//        authStrategy.configHttpSecurity(http);
+//        return http.build();
+//    }
+
 
     /**
      * ** CORS 설정 **
@@ -92,7 +112,9 @@ public class SecurityConfig {
         corsConfig.setAllowedOrigins(List.of(    // 접근 허용할 URL 등록
                 "http://localhost:3030",
                 "http://localhost:9090",
-                "http://localhost:3306"
+                "http://localhost:3306",
+                "http://192.168.0.4:3306",
+                "http://localhost:6060"
         ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
