@@ -3,8 +3,9 @@ package com.farmorai.backend.config;
 import com.farmorai.backend.dto.MemberRole;
 import com.farmorai.backend.securityFilter.AuthStrategy;
 import com.farmorai.backend.securityFilter.AuthenticationFilter;
-import com.farmorai.backend.service.MemberDetailsService;
+import com.farmorai.backend.securityFilter.MemberDetailsService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +37,11 @@ public class SecurityConfig {
     private final AuthStrategy authStrategy;
     private final MemberDetailsService memberDetailsService;
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
     // 비밀번호 단방향 암호화 인터페이스 (Bean 등록)
     @Bean
     protected PasswordEncoder passwordEncoder() {
@@ -55,7 +61,7 @@ public class SecurityConfig {
 
     // 보안 필터 체인 (Bean 등록)
     @Bean
-    protected SecurityFilterChain filterChain(
+    protected SecurityFilterChain securityFilterChain(
             HttpSecurity http, AuthenticationManager authManager
     ) throws Exception {
         http.csrf((auth) -> auth.disable())                            // CSRF 비활성화
@@ -81,7 +87,7 @@ public class SecurityConfig {
 
     // login 설정
     private AuthenticationFilter authFilter(AuthenticationManager authManager) {
-        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
+        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy, objectMapper());
         authFilter.setFilterProcessesUrl("/login");
         return authFilter;
     }
