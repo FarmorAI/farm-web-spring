@@ -64,8 +64,8 @@ public class SecurityConfig {
             .httpBasic((auth) -> auth.disable())
             // HTTP 요청 경로별 인가 설정
             .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
-                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
+//                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
+//                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
                     .anyRequest().permitAll()
             )
             // Login 설정
