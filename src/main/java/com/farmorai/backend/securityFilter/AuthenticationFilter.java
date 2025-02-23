@@ -1,5 +1,6 @@
 package com.farmorai.backend.securityFilter;
 
+import com.farmorai.backend.exception.AuthProcessException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -15,14 +16,16 @@ import java.io.IOException;
 import java.util.Map;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final AuthenticationManager authenticationManager;
     private final AuthStrategy authStrategy;
 
     public AuthenticationFilter(
             AuthenticationManager authManager,
-            AuthStrategy authStrategy
+            AuthStrategy authStrategy,
+            ObjectMapper objectMapper
     ) {
+        this.objectMapper = objectMapper;
         this.authenticationManager = authManager;
         this.authStrategy = authStrategy;
     }
@@ -49,7 +52,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             return authenticationManager.authenticate(authToken);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to parse requestBody", e);
+            logger.error("Failed to parse requestBody", e);  // 로깅 추가
+            throw new AuthProcessException("Failed to request authentication", e);
         }
     }
 
@@ -74,10 +78,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         resp.setContentType("application/json");
-        objectMapper.writeValue(resp.getWriter(),
-            Map.of(
-                    "success", false,
-                    "message", "Login Failed"
+        objectMapper.writeValue(
+            resp.getWriter(), Map.of(
+                "success", false,
+                "message", "Login Failed",
+                "errorCode", "AUTH_FAILED",
+                "details", failed.getMessage()
             )
         );
     }

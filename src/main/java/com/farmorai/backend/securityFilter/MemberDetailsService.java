@@ -1,4 +1,4 @@
-package com.farmorai.backend.service;
+package com.farmorai.backend.securityFilter;
 
 import com.farmorai.backend.dto.MemberDto;
 import com.farmorai.backend.mapper.MemberMapper;

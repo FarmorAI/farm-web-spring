@@ -61,7 +61,7 @@ public class JwtTokenProvider {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
-    // jwt 토큰 유효 여부 검증
+    // JWT 토큰 유효 여부 검증
     public Boolean isJwtExpired(String token) {
         try {
             return parseClaims(token).getExpiration().before(new Date());
