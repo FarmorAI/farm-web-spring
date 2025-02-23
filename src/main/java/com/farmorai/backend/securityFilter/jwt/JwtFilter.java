@@ -28,52 +28,54 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
+            throws ServletException, IOException {
 
-        // request에서 Authorization Header 찾음
         String authorization = req.getHeader("Authorization");
 
-        // Authorization Header 검증
+        // 🚨 추가된 로그
+        log.info("🔍 Received Authorization Header: {}", authorization);
+
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.warn("JWT token null");
+            log.warn("🚨 JWT token is missing or does not start with 'Bearer'");
             filterChain.doFilter(req, resp);
             return;
         }
 
-        // Bearer 부분 제거 후 순수 토큰 획득
-        String token = authorization.split(" ")[1];
+        String[] authParts = authorization.split(" ");
+        if (authParts.length < 2) {
+            log.warn("🚨 JWT token format is incorrect: {}", authorization);
+            filterChain.doFilter(req, resp);
+            return;
+        }
 
-        // 토큰 소멸 시간 검증
+        String token = authParts[1];
+
+        // JWT 형식 확인
+        if (!token.contains(".") || token.split("\\.").length != 3) {
+            log.warn("🚨 JWT token is not correctly formatted (dots missing): {}", token);
+            filterChain.doFilter(req, resp);
+            return;
+        }
+
         if (jwtTokenProvider.isJwtExpired(token)) {
-            log.warn("JWT token expired");
+            log.warn("🚨 JWT token expired");
             filterChain.doFilter(req, resp);
             return;
         }
 
-        // 토큰에서 email과 role 획득
         String email = jwtTokenProvider.getEmail(token);
         String role = jwtTokenProvider.getRole(token);
 
-        // UserDetails 객체 생성
         UserDetails userDetails = User.builder()
                 .username(email)
                 .password("")
                 .roles(role)
                 .build();
 
-        // 스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(
-                userDetails,null, userDetails.getAuthorities()
-        );
-
-        // 세션에 사용자 등록
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        // 현재 필터의 처리를 마친 후, 다음 필터 또는 컨트롤러로 요청을 넘기는 역할
         filterChain.doFilter(req, resp);
     }
 }
