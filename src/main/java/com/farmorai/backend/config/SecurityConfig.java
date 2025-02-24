@@ -87,14 +87,14 @@ public class SecurityConfig {
     // login 설정
     private AuthenticationFilter authFilter(AuthenticationManager authManager) {
         AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy, objectMapper());
-        authFilter.setFilterProcessesUrl("/login");
+        authFilter.setFilterProcessesUrl("/api/login");
         return authFilter;
     }
 
     // logout 설정
     private void configLogout(LogoutConfigurer<HttpSecurity> logout) {
         logout
-            .logoutUrl("/logout")
+            .logoutUrl("/api/logout")
             .logoutSuccessHandler((req, res, authentication) ->
                     authStrategy.logout(req, res));
     }
