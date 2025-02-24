@@ -3,8 +3,9 @@ package com.farmorai.backend.config;
 import com.farmorai.backend.dto.MemberRole;
 import com.farmorai.backend.securityFilter.AuthStrategy;
 import com.farmorai.backend.securityFilter.AuthenticationFilter;
-import com.farmorai.backend.service.MemberDetailsService;
+import com.farmorai.backend.securityFilter.MemberDetailsService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +13,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,6 +37,11 @@ public class SecurityConfig {
     private final AuthStrategy authStrategy;
     private final MemberDetailsService memberDetailsService;
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
     // 비밀번호 단방향 암호화 인터페이스 (Bean 등록)
     @Bean
     protected PasswordEncoder passwordEncoder() {
@@ -45,36 +52,25 @@ public class SecurityConfig {
     // "MemberDetailsService"가 반환한 "UserDetails" 객체를 가지고,
     // "UsernamePasswordAuthentication" 객체를 만들어 "ProviderManager"에 제공
     @Bean
-    public AuthenticationManager authManager() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(memberDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authProvider);
+    public AuthenticationManager authManager(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider DaoAuthProvider = new DaoAuthenticationProvider();
+        DaoAuthProvider.setUserDetailsService(memberDetailsService);
+        DaoAuthProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(DaoAuthProvider);
     }
 
     // 보안 필터 체인 (Bean 등록)
     @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy);
-        authFilter.setFilterProcessesUrl("/login"); // 로그인 인증 URL
-
-        http.csrf((auth) -> auth.disable())  // CSRF(Cross-Site Request Forgery) 비활성화
-            .cors(cors -> cors.configurationSource(corsSource()))
+    protected SecurityFilterChain securityFilterChain(
+            HttpSecurity http, AuthenticationManager authManager
+    ) throws Exception {
+        http.csrf((auth) -> auth.disable())                            // CSRF 비활성화
+            .cors(cors -> cors.configurationSource(corsSource()))      // CORS 설정 활성화
             .formLogin((auth) -> auth.disable())
             .httpBasic((auth) -> auth.disable())
-            // HTTP 요청 경로별 인가 설정
-            .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-//                    .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.toString())
-//                    .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.toString(), MemberRole.USER.toString())
-                    .anyRequest().permitAll()
-            )
-            // Login 설정
-            .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
-            // Logout 설정
-            .logout(logout -> logout.logoutUrl("/logout")
-                .logoutSuccessHandler((req, res, authentication) ->
-                        authStrategy.logout(req, res))
-            );
+            .authorizeHttpRequests(this::configAuthHttpReq)                                    // HTTP 요청 경로별 인가 설정
+            .addFilterAt(authFilter(authManager), UsernamePasswordAuthenticationFilter.class)  // Login 설정
+            .logout(this::configLogout);                                                       // Logout 설정
 
         authStrategy.configHttpSecurity(http);  // 전략별 추가 설정 적용
         return http.build();
@@ -98,6 +94,30 @@ public class SecurityConfig {
 //        authStrategy.configHttpSecurity(http);
 //        return http.build();
 //    }
+
+
+    // HTTP 요청 경로별 인가 설정
+    private void configAuthHttpReq(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
+        authz
+            .requestMatchers("/admin/**").hasRole(MemberRole.ADMIN.name())
+            .requestMatchers("/auth/**").hasAnyRole(MemberRole.ADMIN.name(), MemberRole.USER.name())
+            .anyRequest().permitAll();
+    }
+
+    // login 설정
+    private AuthenticationFilter authFilter(AuthenticationManager authManager) {
+        AuthenticationFilter authFilter = new AuthenticationFilter(authManager, authStrategy, objectMapper());
+        authFilter.setFilterProcessesUrl("/login");
+        return authFilter;
+    }
+
+    // logout 설정
+    private void configLogout(LogoutConfigurer<HttpSecurity> logout) {
+        logout
+            .logoutUrl("/logout")
+            .logoutSuccessHandler((req, res, authentication) ->
+                    authStrategy.logout(req, res));
+    }
 
 
     /**
