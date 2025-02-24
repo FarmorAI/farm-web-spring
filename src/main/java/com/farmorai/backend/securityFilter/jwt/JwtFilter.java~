@@ -77,7 +77,6 @@ public class JwtFilter extends OncePerRequestFilter {
     // Authentication 토큰 생성
     private Authentication createAuth(String token) {
         String email = jwtTokenProvider.getEmail(token);  // token -> email
-        String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
         User principal = new User(email, "", auth);

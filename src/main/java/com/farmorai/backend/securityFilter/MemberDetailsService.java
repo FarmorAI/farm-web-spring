@@ -3,11 +3,14 @@ package com.farmorai.backend.securityFilter;
 import com.farmorai.backend.dto.MemberDto;
 import com.farmorai.backend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +26,17 @@ public class MemberDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found: " + email);
         }
 
+        // 권한 생성
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
+                "ROLE_" + memberDto.getMemberRole().toString()
+        );
+
         // Member 인증을 위한 User 객체 생성
-        return User.withUsername(memberDto.getEmail())       // Email
-                .password(memberDto.getPassword())           // Hashed Password
-                .roles(memberDto.getMemberRole().toString()) // Role
-                .build();
+        return new CustomUserDetails(
+                memberDto.getEmail(),
+                memberDto.getPassword(),
+                Collections.singleton(authority),
+                memberDto.getNickname()
+        );
     }
 }
