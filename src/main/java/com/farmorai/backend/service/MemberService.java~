@@ -1,7 +1,6 @@
 package com.farmorai.backend.service;
 
 import com.farmorai.backend.dto.MemberDto;
-import com.farmorai.backend.dto.MemberRole;
 import com.farmorai.backend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +32,6 @@ public class MemberService {
     // 회원 등록
     public void insertMember(MemberDto memberDto) {
         String pwd = memberDto.getPassword();
-        memberDto.setMemberRole(MemberRole.USER);
         memberDto.setPassword(passwordEncoder.encode(pwd));
         memberMapper.insertMember(memberDto);
     }

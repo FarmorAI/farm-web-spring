@@ -49,7 +49,7 @@ class JwtAuthStrategyTest {
                 Collections.singletonList(new SimpleGrantedAuthority("USER"))
         );
         when(authentication.getPrincipal()).thenReturn(user);
-        when(jwtTokenProvider.createJwtToken("test@example.com", "USER")).thenReturn("validToken");
+        when(jwtTokenProvider.createJwtToken("test@example.com", "USER", "testName")).thenReturn("validToken");
 
         jwtAuthStrategy.onAuthSuccess(req, resp, authentication);
 

@@ -22,6 +22,7 @@ class JwtTokenProviderTest {
 
     private String email = "test@example.com";
     private String role = "ADMIN";
+    private String nickname = "testName";
 
     @BeforeEach
     void setUp() {
@@ -31,7 +32,7 @@ class JwtTokenProviderTest {
 
     @Test
     void createJwtToken() {
-        String token = jwtTokenProvider.createJwtToken(email, role);
+        String token = jwtTokenProvider.createJwtToken(email, role, nickname);
 
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
@@ -46,7 +47,7 @@ class JwtTokenProviderTest {
     @Test
     void isJwtExpired() {
         JwtTokenProvider expiredProvider = new JwtTokenProvider(SECRET, -1);
-        String token = expiredProvider.createJwtToken(email, role);
+        String token = expiredProvider.createJwtToken(email, role, nickname);
         boolean isExpired = expiredProvider.isJwtExpired(token);
         assertTrue(isExpired);
     }
