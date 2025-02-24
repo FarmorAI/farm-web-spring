@@ -64,4 +64,14 @@
     <delete id="deleteMember" parameterType="java.lang.Long">
         DELETE FROM member WHERE member_id = #{memberId}
     </delete>
+
+    <!-- 닉네임 중복 검사 -->
+    <select id="checkNickname" parameterType="string" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM member WHERE nickname = #{nickname})
+    </select>
+
+    <!-- 이메일 중복 검사 -->
+    <select id="checkEmail" parameterType="string" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM member WHERE email = #{email})
+    </select>
 </mapper>
