@@ -33,12 +33,13 @@ public class JwtTokenProvider {
     }
 
     // JWT 생성
-    public String createJwtToken(String email, String role) {
+    public String createJwtToken(String email, String role, String nickname) {
         long now = System.currentTimeMillis();                 // 현재 시간(ms)
 
         return Jwts.builder()
-                .claim("email", email)                         // "email"로 이메일 정보 추가
-                .claim("role", role)                           // "auth"로 권한 정보 추가
+                .claim("email", email)                      // "email"로 이메일 정보 추가
+                .claim("nickname", nickname)                // "email"로 이메일 정보 추가
+                .claim("role", role)                        // "auth"로 권한 정보 추가
                 .setIssuedAt(new Date(now))                       // 토큰 발급 시간 설정
                 .setExpiration(new Date(now + tokenValidityTime)) // 토큰 만료 시간 설정
                 .signWith(secretKey, SignatureAlgorithm.HS256)    // JWT 서명 (시크릿 키로 서명)
@@ -49,6 +50,11 @@ public class JwtTokenProvider {
     // email 조회
     public String getEmail(String token) {
         return parseClaims(token).get("email", String.class);
+    }
+
+    // nickname 조회
+    public String getNickname(String token) {
+        return parseClaims(token).get("nickname", String.class);
     }
 
     // 권한 조회
