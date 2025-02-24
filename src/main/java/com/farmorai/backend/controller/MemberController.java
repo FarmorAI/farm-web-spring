@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping
+@RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
@@ -31,14 +31,27 @@ public class MemberController {
         return "success";
     }
 
+    // 닉네임 중복 검사
+    @GetMapping(value = "/join/nickname/{nickname}")
+    public boolean checkJoin(@PathVariable(value = "nickname") String nickname) {
+        return memberService.checkNickname(nickname);
+    }
+
+    // 이메일 중복 검사
+    @GetMapping(value = "/join/email/{email}")
+    public boolean checkEmail(@PathVariable(value = "email") String email) {
+        return memberService.checkEmail(email);
+    }
+
+
     // 회원 조회 (by id)
-    @GetMapping(value = "/auth/{memberId}")
+    @GetMapping(value = "/auth/id/{memberId}")
     public MemberDto getMemberById(@PathVariable(value = "memberId") Long memberId) {
         return memberService.getMemberById(memberId);
     }
 
     // 회원 조회 (by email)
-    @GetMapping(value = "/auth/{email}")
+    @GetMapping(value = "/auth/email/{email}")
     public MemberDto getMemberByEmail(@PathVariable(value = "email") String email) {
         return memberService.getMemberByEmail(email);
     }
