@@ -32,8 +32,16 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String requestURI = req.getRequestURI();
         // "Request"의 Header:"Authorization"을 찾아 "JWT"를 반환
         String token = resolveToken(req);
+
+        //소셜 로그인 요청이면 필터에서 제외합니다.
+        if(requestURI.startsWith("/api/member/social")){
+            filterChain.doFilter(req,resp);
+            return;
+        }
+
 
         // JWT 존재 여부 확인
         if(token == null) {
@@ -45,9 +53,9 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // JWT 유효성 확인
             if (jwtTokenProvider.isJwtExpired(token)) {
-               log.warn("Expried JWT: {}", req.getRequestURI());
-               filterChain.doFilter(req, resp);
-               return;
+                log.warn("Expried JWT: {}", req.getRequestURI());
+                filterChain.doFilter(req, resp);
+                return;
             }
             Authentication authentication = createAuth(token);  // 스프링 시큐리티 인증 토큰 생성
             SecurityContextHolder.getContext().setAuthentication(authentication);  // 세션에 사용자 등록
