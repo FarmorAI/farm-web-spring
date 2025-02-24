@@ -1,9 +1,9 @@
 package com.farmorai.backend.securityFilter;
 
+import com.farmorai.backend.exception.AuthProcessException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,14 +16,16 @@ import java.io.IOException;
 import java.util.Map;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final AuthenticationManager authenticationManager;
     private final AuthStrategy authStrategy;
 
     public AuthenticationFilter(
             AuthenticationManager authManager,
-            AuthStrategy authStrategy
+            AuthStrategy authStrategy,
+            ObjectMapper objectMapper
     ) {
+        this.objectMapper = objectMapper;
         this.authenticationManager = authManager;
         this.authStrategy = authStrategy;
     }
@@ -35,9 +37,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             HttpServletResponse resp
     ) throws AuthenticationException {
         try {
-            /** 클라이언트 요청에서 email, password를 추출 **/
+            // Get email, password from Client
             Map<String, String> requestBody = objectMapper.readValue(
-                    req.getInputStream(), new TypeReference<Map<String, String>>() {}
+                    req.getInputStream(), new TypeReference<>() {}
             );
             String email = requestBody.get("email");
             String password = requestBody.get("password");
@@ -50,7 +52,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             return authenticationManager.authenticate(authToken);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to parse requestBody", e);
+            logger.error("Failed to parse requestBody", e);  // 로깅 추가
+            throw new AuthProcessException("Failed to request authentication", e);
         }
     }
 
@@ -71,14 +74,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             HttpServletRequest req,
             HttpServletResponse resp,
             AuthenticationException failed
-    ) throws IOException, ServletException {
+    ) throws IOException {
 
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         resp.setContentType("application/json");
-        objectMapper.writeValue(resp.getWriter(),
-            Map.of(
-                    "success", false,
-                    "message", "Login Failed"
+        objectMapper.writeValue(
+            resp.getWriter(), Map.of(
+                "success", false,
+                "message", "Login Failed",
+                "errorCode", "AUTH_FAILED",
+                "details", failed.getMessage()
             )
         );
     }
