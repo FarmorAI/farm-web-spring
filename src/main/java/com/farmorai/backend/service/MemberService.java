@@ -1,13 +1,18 @@
 package com.farmorai.backend.service;
 
 import com.farmorai.backend.dto.MemberDto;
+import com.farmorai.backend.dto.MemberRole;
 import com.farmorai.backend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+=======
+import org.springframework.security.crypto.password.PasswordEncoder;
+>>>>>>> develop
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -21,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberMapper memberMapper;
+    private final PasswordEncoder passwordEncoder;
 
     // 전체 회원 조회
     public List<MemberDto> getAllMember() {
@@ -39,6 +45,9 @@ public class MemberService {
 
     // 회원 등록
     public void insertMember(MemberDto memberDto) {
+        String pwd = memberDto.getPassword();
+        memberDto.setMemberRole(MemberRole.USER);
+        memberDto.setPassword(passwordEncoder.encode(pwd));
         memberMapper.insertMember(memberDto);
     }
 
@@ -51,6 +60,7 @@ public class MemberService {
     public void deleteMember(Long memberId) {
         memberMapper.deleteMember(memberId);
     }
+
 
     //소셜 로그인 카카오
     public MemberDto getKakaoMember(String accessToken){
@@ -84,6 +94,17 @@ public class MemberService {
         log.info(bodyMap);
 
 
+    }
+
+
+    // 닉네임 중복 검사
+    public boolean checkNickname(String nickname) {
+        return memberMapper.checkNickname(nickname);
+    }
+
+    // 이메일 중복 검사
+    public boolean checkEmail(String email) {
+        return memberMapper.checkEmail(email);
     }
 
 }
