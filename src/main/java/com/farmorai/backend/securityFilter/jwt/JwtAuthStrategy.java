@@ -1,6 +1,7 @@
 package com.farmorai.backend.securityFilter.jwt;
 
 import com.farmorai.backend.securityFilter.AuthStrategy;
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
@@ -40,16 +40,14 @@ public class JwtAuthStrategy implements AuthStrategy {
             HttpServletResponse resp,
             Authentication authentication
     ) throws IOException {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String email = userDetails.getUsername();
-
-        // JWT 토큰 생성
+        // JWT 토큰 생성 및 "Header"에 추가
         String token = jwtTokenProvider.createJwtToken(
                 userDetails.getUsername(),
-                userDetails.getAuthorities().iterator().next().getAuthority()
+                userDetails.getAuthorities().iterator().next().getAuthority(),
+                userDetails.getNickname()
         );
-        // Header <- JWT 토큰을 추가
         resp.addHeader("Authorization", "Bearer " + token);
     }
 
