@@ -21,4 +21,5 @@ public class MemberDto {
     private String address;
     private String createdAt;
     private String updatedAt;
+    private boolean social;
 }

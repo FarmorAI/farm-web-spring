@@ -32,8 +32,16 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String requestURI = req.getRequestURI();
         // "Request"의 Header:"Authorization"을 찾아 "JWT"를 반환
         String token = resolveToken(req);
+
+        //소셜 로그인 요청이면 필터에서 제외합니다.
+        if(requestURI.startsWith("/api/member/social")){
+            filterChain.doFilter(req,resp);
+            return;
+        }
+
 
         // JWT 존재 여부 확인
         if(token == null) {

@@ -4,15 +4,12 @@ import com.farmorai.backend.dto.MemberDto;
 import com.farmorai.backend.dto.MemberRole;
 import com.farmorai.backend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-=======
 import org.springframework.security.crypto.password.PasswordEncoder;
->>>>>>> develop
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -43,6 +40,10 @@ public class MemberService {
         return memberMapper.getMemberByEmail(email);
     }
 
+    public MemberDto getMemberByNickname(String nickname) {
+        return memberMapper.getMemberByNickname(nickname);
+    }
+
     // 회원 등록
     public void insertMember(MemberDto memberDto) {
         String pwd = memberDto.getPassword();
@@ -64,15 +65,38 @@ public class MemberService {
 
     //소셜 로그인 카카오
     public MemberDto getKakaoMember(String accessToken){
-        //accessToken 을 이용해서 사용자 정보를 가져옵니다.
-        getEmailFromKakaoAcessToken(accessToken);
+        //accessToken 을 이용해서 사용자 정보를 가져옵니다. -> 닉네임
+        String nickname = getEmailFromKakaoAccessToken(accessToken);
 
-        //기존에 DB에 회원 정보가 있는 경우 / 없는 경우
+        //기존에 DB에 회원 정보가 있는 경우
+        boolean checkNickname = memberMapper.checkNickname(nickname);
+        if(checkNickname){
+            MemberDto memberDto = memberMapper.getMemberByNickname(nickname);//기존의 멤버 정보를 반환합니다.
+            log.info("memberDto = {}", memberDto);
+            return memberDto;
+        }
 
-        return null;
+        //DB에 회원 정보가 없는 경우
+        MemberDto socialMember = makeSocialMember(nickname);
+        memberMapper.insertMember(socialMember);
+
+        return socialMember;
     }
 
-    private void getEmailFromKakaoAcessToken(String accessToken){
+    private MemberDto makeSocialMember(String nickname){
+        String tempPassword = makeTempPassword();
+        log.info("tempPassword = {}", tempPassword);
+        return MemberDto.builder()
+                .email(nickname+"@kakao.com")
+                .name("Social Member")
+                .password(passwordEncoder.encode(tempPassword))
+                .nickname(nickname)
+                .memberRole(MemberRole.USER)
+                .social(true)
+                .build();
+    }
+
+    private String getEmailFromKakaoAccessToken(String accessToken){
         String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
         RestTemplate restTemplate = new RestTemplate();
 
@@ -80,22 +104,29 @@ public class MemberService {
         headers.add("Authorization","Bearer "+ accessToken);
         headers.add("Content-Type","application/x-www-form-urlencoded;charset=utf-8");
 
-        HttpEntity<Object> entity = new HttpEntity<>(headers);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
         UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoGetUserURL).build();
 
-        ResponseEntity<LinkedHashMap> response =
-                restTemplate.exchange(uriBuilder.toUri(), HttpMethod.POST,entity,LinkedHashMap.class);
-        log.info(response);
-
-        LinkedHashMap<String,LinkedHashMap> bodyMap = response.getBody();
+        LinkedHashMap<String,LinkedHashMap> kakaoResult = restTemplate.exchange(uriBuilder.toUri(), HttpMethod.POST,entity,LinkedHashMap.class).getBody();
 
         log.info("--------------------------");
-        log.info(bodyMap);
+        log.info(kakaoResult);
+        LinkedHashMap<String,String> properties = kakaoResult.get("properties");
 
+        String nickname = properties.get("nickname");
+        log.info("nickname = {}", nickname);
 
+        return nickname;
     }
 
+    private String makeTempPassword() {
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            buffer.append((char) ((Math.random() * 55) + 65));
+        }
+        return buffer.toString();
+    }
 
     // 닉네임 중복 검사
     public boolean checkNickname(String nickname) {
