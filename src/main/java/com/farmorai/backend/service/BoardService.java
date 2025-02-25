@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -17,9 +19,22 @@ public class BoardService {
     private final BoardMapper boardMapper;
     private final FileUploadUtil fileUploadUtil;
 
-    public List<BoardDto> getBoardList(){
-        return boardMapper.getBoardList();
-    };
+    public Map<String, Object> getBoardList(int page, int size) {
+        int offset = (page - 1) * size; // OFFSET 계산
+
+        List<BoardDto> boardList = boardMapper.getBoardList(offset, size);
+        int totalBoardCount = boardMapper.getTotalBoardCount();
+        int totalPages = (int) Math.ceil((double) totalBoardCount / size);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", boardList);
+        response.put("totalPages", totalPages);
+        response.put("totalElements", totalBoardCount);
+        response.put("size", size);
+        response.put("currentPage", page);
+
+        return response;
+    }
 
     @Transactional
     public void deleteBoard(Long boardId) {
