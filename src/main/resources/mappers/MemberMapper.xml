@@ -38,11 +38,16 @@
             member_role, address, created_at, updated_at FROM member WHERE email = #{email}
     </select>
 
+    <!-- 회원 조회 by Nickname -->
+    <select id="getMemberByNickname" parameterType="String" resultType="com.farmorai.backend.dto.MemberDto">
+        SELECT member_id, email, password, name, nickname, phone, birth_date,
+               member_role, address, created_at, updated_at, social FROM member WHERE nickname = #{nickname}
+    </select>
 
     <!-- 회원 등록 -->
     <insert id="insertMember" parameterType="com.farmorai.backend.dto.MemberDto">
-        INSERT INTO member (email, password, name, nickname, phone, birth_date, member_role, address, created_at, updated_at)
-            VALUES (#{email}, #{password}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now())
+        INSERT INTO member (email, password, name, nickname, phone, birth_date, member_role, address, created_at, updated_at, social)
+            VALUES (#{email}, #{password}, #{name}, #{nickname}, #{phone}, #{birthDate}, #{memberRole}, #{address}, now(), now(), #{social})
     </insert>
 
 
@@ -64,4 +69,14 @@
     <delete id="deleteMember" parameterType="java.lang.Long">
         DELETE FROM member WHERE member_id = #{memberId}
     </delete>
+
+    <!-- 닉네임 중복 검사 -->
+    <select id="checkNickname" parameterType="string" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM member WHERE nickname = #{nickname})
+    </select>
+
+    <!-- 이메일 중복 검사 -->
+    <select id="checkEmail" parameterType="string" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM member WHERE email = #{email})
+    </select>
 </mapper>
