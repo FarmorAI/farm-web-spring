@@ -8,7 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface BoardMapper {
-    List<BoardDto> getBoardList();
+    List<BoardDto> getBoardList(@Param("offset") int offset, @Param("size") int size);
+    int getTotalBoardCount();
 
     void deleteBoard(Long boardId);
 
