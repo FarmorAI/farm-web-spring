@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/board")
+@RequestMapping("/api/board")
 public class BoardController {
     private final BoardService boardService;
     private final FileUploadUtil fileUploadUtil = new FileUploadUtil();
