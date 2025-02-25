@@ -36,7 +36,6 @@ public class FileUploadController {
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;
 
-
     /**
      * React 에서 파일 업로드 → Spring Boot 가 저장 후 FastAPI 로 전송
      */
