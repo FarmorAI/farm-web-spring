@@ -12,10 +12,16 @@ public interface MemberMapper {
 
     MemberDto getMemberById(Long memberId);
     MemberDto getMemberByEmail(String email);
+    MemberDto getMemberByNickname(String nickname);
 
     void insertMember(MemberDto memberDto);
 
     void updateMember(MemberDto memberDto);
 
     void deleteMember(Long memberId);
+
+    boolean checkNickname(String nickname);
+
+    boolean checkEmail(String email);
+
 }
