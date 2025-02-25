@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MyBatis 매퍼 파일의 루트 태그. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.farmorai.backend.mapper.InquiryMapper">
+
+    <!-- 전체 문의 조회 -->
+    <select id="getInquiryList" resultType="com.farmorai.backend.dto.InquiryDto">
+        SELECT * FROM inquiry
+    </select>
+
+    <!-- 문의 조회 by ID -->
+    <select id="getInquiryById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.InquiryDto">
+        SELECT inquiry_id, title, content, category, created_at, updated_at, views, member_id
+            FROM inquiry WHERE inquiry_id = #{inquiryId}
+    </select>
+
+</mapper>
+
