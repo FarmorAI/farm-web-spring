@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Service
@@ -83,9 +85,47 @@ public class MemberService {
         return socialMember;
     }
 
+
+    public MemberDto getGoogleMember(String accessToken) {
+        String googleGetUserURL = "https://www.googleapis.com/oauth2/v3/userinfo";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                googleGetUserURL, HttpMethod.POST, entity, Map.class);
+
+        Map<String, Object> googleUser = response.getBody();
+        String email = (String) googleUser.get("email");
+        String name = (String) googleUser.get("name");
+
+
+        // DB에서 회원 정보 조회
+        MemberDto existingMember = memberMapper.getMemberByEmail(email);
+        if (existingMember != null) {
+            log.info("기존 회원 로그인 처리");
+            return existingMember;
+        }
+
+
+        // 신규 회원 가입 처리
+        MemberDto newMember = MemberDto.builder()
+                .email(email)
+                .name(name)
+                .nickname(name)
+                .password(passwordEncoder.encode(makeTempPassword()))
+                .memberRole(MemberRole.USER)
+                .social(true)
+                .build();
+        memberMapper.insertMember(newMember);
+        return newMember;
+    }
+
+
     private MemberDto makeSocialMember(String nickname){
         String tempPassword = makeTempPassword();
-        log.info("tempPassword = {}", tempPassword);
         return MemberDto.builder()
                 .email(nickname+"@kakao.com")
                 .name("Social Member")
@@ -137,5 +177,6 @@ public class MemberService {
     public boolean checkEmail(String email) {
         return memberMapper.checkEmail(email);
     }
+
 
 }
