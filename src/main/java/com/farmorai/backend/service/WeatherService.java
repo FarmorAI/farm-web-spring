@@ -1,43 +1,57 @@
 package com.farmorai.backend.service;
 
-import org.springframework.http.ResponseEntity;
+
+import com.farmorai.backend.util.GridConvertUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDate;
-import java.util.Map;
+import java.net.URI;
 
 @Service
 public class WeatherService {
-    private final String weatherApiKey = "10hq%2FXQHlvOAFMbPmF7Iwe0j1bOYBeh2x0dh6Budm8HVNXqsQpPcwYF3Z5r%2F0r%2FYoFAMpK%2BYg1ztyXBLMNE9xw%3D%3D";
-    private final RestTemplate restTemplate = new RestTemplate();
 
-    // 사용자의 위치 가져오기
-    public String getLocation(){
-        String apiUrl = "http://ip-api.com/json";
-        Map<String, Object> response = restTemplate.getForObject(apiUrl, Map.class);
+    @Value("${WEATHER_API_KEY}")
+    private String apiKey;
 
-        String city = (String)response.get("city");
-        String region = (String)response.get("regionName");
+    private final GridConvertUtil gridConvertUtil;
+    private final RestTemplate restTemplate;
 
-        return region != null ? region : city;    }
 
-    public String getCurrentDate(){
-        return LocalDate.now().toString();
+
+    public WeatherService(GridConvertUtil gridConvertUtil) {
+        this.gridConvertUtil = gridConvertUtil;
+        this.restTemplate = new RestTemplate();
     }
 
-    public String getWeather(){
-        String location = getLocation();
-        String currentDate = getCurrentDate();
+    public String getWeather(double lat, double lon, String baseDate, String baseTime) {
+        // 위도, 경도 기상청 격자로 변환
+        GridConvertUtil.Grid grid = gridConvertUtil.convertToGrid(lat, lon);
 
-        String apiUrl = "http://apis.data.go.kr/1390802/AgriWeather/WeatherObsrInfo/V2/GnrlWeather" +
-                "?serviceKey=" + weatherApiKey +
-                "&Page_No=1" +
-                "&Page_Size=20" +
-                "&date_Time=" + currentDate + // 현재 날짜 자동 입력
-                "&obsr_Spot_Nm=" + location +
-                "&dataType=json";
-        ResponseEntity<String> response = restTemplate.getForEntity(apiUrl,String.class);
-        return response.getBody();
+        URI uri = UriComponentsBuilder.fromHttpUrl("http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst")
+                .queryParam("serviceKey", apiKey) // 📌 자동 URL 인코딩됨
+                .queryParam("numOfRows", 10)
+                .queryParam("pageNo", 1)
+                .queryParam("dataType", "JSON")
+                .queryParam("base_date", baseDate)
+                .queryParam("base_time", baseTime)
+                .queryParam("nx", grid.nx)  // 격자 변환된 값 사용
+                .queryParam("ny", grid.ny)
+                .encode()  // 📌 자동 URL 인코딩
+                .build()
+                .toUri();
+/*        String url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst" +
+                "?serviceKey=" + apiKey +
+                "&numOfRows=10" +
+                "&pageNo=1" +
+                "&dataType=JSON" +  // JSON 형식으로 응답 받기
+                "&base_date=" + baseDate +
+                "&base_time=" + baseTime +
+                "&nx=" + grid.nx +
+                "&ny=" + grid.ny;*/
+
+        return restTemplate.getForObject(uri, String.class);
     }
+
 }
