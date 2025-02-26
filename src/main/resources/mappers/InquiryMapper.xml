@@ -2,19 +2,74 @@
 <!-- MyBatis 매퍼 파일의 루트 태그. -->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
 <mapper namespace="com.farmorai.backend.mapper.InquiryMapper">
-
     <!-- 전체 문의 조회 -->
-    <select id="getInquiryList" resultType="com.farmorai.backend.dto.InquiryDto">
-        SELECT * FROM inquiry
+    <select id="getInquiryList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.InquiryDto">
+        SELECT
+            i.inquiry_id,
+            i.title,
+            i.content,
+            i.category,
+            i.created_at,
+            i.updated_at,
+            i.views,
+            m.nickname as writer
+        FROM inquiry i
+        LEFT JOIN member m ON i.member_id = m.member_id
+        <where>
+            1=1
+            <if test="title != null and title != ''">
+                AND title Like CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+        ORDER BY i.inquiry_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 데이터 개수 조회 -->
+    <select id="getInquiryListCount" resultType="int">
+        SELECT COUNT(*) FROM inquiry
     </select>
 
     <!-- 문의 조회 by ID -->
     <select id="getInquiryById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.InquiryDto">
-        SELECT inquiry_id, title, content, category, created_at, updated_at, views, member_id
-            FROM inquiry WHERE inquiry_id = #{inquiryId}
+        SELECT
+            i.inquiry_id,
+            i.title,
+            i.content,
+            i.category,
+            i.created_at,
+            i.updated_at,
+            i.views,
+            m.nickname as writer
+        FROM inquiry i
+        LEFT JOIN member m ON i.member_id = m.member_id
+        WHERE inquiry_id = #{inquiryId}
     </select>
 
+    <!-- 문의 추가 -->
+    <insert id="insertInquiry" parameterType="com.farmorai.backend.dto.InquiryDto">
+        INSERT INTO inquiry (title, content, category, member_id)
+        VALUES (#{title}, #{content}, #{category}, #{memberId})
+    </insert>
+
+    <!-- 문의 수정 -->
+    <update id="updateInquiry" parameterType="com.farmorai.backend.dto.InquiryDto">
+        UPDATE inquiry
+        SET
+        title = #{title},
+        content = #{content},
+        category = #{category},
+        updated_at = NOW()
+        WHERE inquiry_id = #{inquiryId}
+    </update>
+
+    <!-- 문의 삭제 -->
+    <delete id="deleteInquiry" parameterType="java.lang.Long">
+        DELETE FROM inquiry WHERE inquiry_id = #{inquiryId}
+    </delete>
 </mapper>
 

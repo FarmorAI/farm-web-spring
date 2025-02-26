@@ -14,7 +14,9 @@ public class InquiryDto {
     private String title;
     private String content;
     private InquiryCategory category;
+    private String categoryKor;
     private String createdAt;
     private String updatedAt;
+    private int views;
     private String writer;
 }
