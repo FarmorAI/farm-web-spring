@@ -44,12 +44,6 @@ public class PageResponseDto<E>{ // 페이징 결과 DTO
         this.nextPage = next? end + 1 : 0;
         this.totalPage = last;
 
-
-
-
     }
-
-
-
 
 }
