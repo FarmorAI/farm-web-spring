@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @RestController
@@ -19,12 +21,20 @@ public class WeatherController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String,Object>> getWeather(
+    public ResponseEntity<Map<String, Map<String, Object>>> getFilteredWeather(
             @RequestParam double lat,
             @RequestParam double lon,
-            @RequestParam String baseDate,
-            @RequestParam String baseTime){
-        Map<String, Object> filteredWeather = weatherService.getFilteredWeather(lat, lon, baseDate, baseTime);
+            @RequestParam(required = false) String baseDate,
+            @RequestParam String baseTime) {
+
+        // ✅ baseDate가 없으면 자동으로 오늘 날짜 설정
+        if (baseDate == null || baseDate.isEmpty()) {
+            baseDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        }
+
+        Map<String, Map<String, Object>> filteredWeather = weatherService.getFilteredWeather(lat, lon, baseDate, baseTime);
         return ResponseEntity.ok(filteredWeather);
     }
+
+
 }

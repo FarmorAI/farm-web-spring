@@ -39,9 +39,9 @@ public class WeatherService {
 
         String encodedApiKey = URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
 
-        String uriString = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst" +
+        String uriString = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst" +
                 "?serviceKey=" + encodedApiKey +
-                "&numOfRows=1000" +
+                "&numOfRows=3000" +
                 "&pageNo=1" +
                 "&dataType=JSON" +
                 "&base_date=" + baseDate +
@@ -57,50 +57,59 @@ public class WeatherService {
         return restTemplate.getForObject(uri, String.class);
     }
 
-    public Map<String, Object> getFilteredWeather(double lat, double lon, String baseDate, String baseTime){
+    public Map<String, Map<String, Object>> getFilteredWeather(double lat, double lon, String baseDate, String baseTime){
         String jsonResponse = getWeather(lat, lon, baseDate, baseTime);
         return extractWeatherData(jsonResponse);
     }
 
     // 필요 정보만 추출
-    public Map<String,Object> extractWeatherData(String jsonResponse){
+    public Map<String, Map<String, Object>> extractWeatherData(String jsonResponse){
         Map<String, String> categoryMapping = new HashMap<>();
-        categoryMapping.put("T1H", "기온");
-        categoryMapping.put("RN1", "강수량");
+        categoryMapping.put("TMN", "일 최저기온");
+        categoryMapping.put("TMX", "일 최고기온");
+        categoryMapping.put("WSD", "풍속");
         categoryMapping.put("SKY", "하늘상태");
         categoryMapping.put("REH", "습도");
-        categoryMapping.put("WSD", "풍속");
-
+        categoryMapping.put("POP", "강수 확률");
         Set<String> targetCategories = categoryMapping.keySet();
 
-        Map<String, Object> result = new LinkedHashMap<>();
+        // 날짜별 결과 저장할 Map
+        Map<String, Map<String, Object>> dailyWeather = new LinkedHashMap<>();
 
         String[] lines = jsonResponse.split("\\{");
 
-        for(String line : lines){
-            if(line.contains("\"category\"")){
+        for (String line : lines) {
+            if (line.contains("\"category\"")) {  // 기상 요소 값 포함된 줄만 필터링
                 String category = extractValue(line, "\"category\":\"", "\"");
-                String fcstTime = extractValue(line, "\"fcstTime\":\"", "\"");
+                String fcstDate = extractValue(line, "\"fcstDate\":\"", "\"");
                 String fcstValue = extractValue(line, "\"fcstValue\":\"", "\"");
 
-                // 8시간 동안의 데이터만 저장 (한글 이름 변환 적용)
-                if (targetCategories.contains(category) && fcstTime != null && fcstValue != null) {
+                if (targetCategories.contains(category) && fcstDate != null && fcstValue != null) {
                     String translatedCategory = categoryMapping.get(category); // 코드명을 한글로 변환
-                    result.put(fcstTime + "_" + translatedCategory, fcstValue);
+
+                    dailyWeather.putIfAbsent(fcstDate, new LinkedHashMap<>());
+
+                    if (category.equals("TMN") || category.equals("TMX")) {
+                        dailyWeather.get(fcstDate).put(translatedCategory, fcstValue);
+                    } else {
+                        Map<String, Object> details = (Map<String, Object>) dailyWeather.get(fcstDate)
+                                .computeIfAbsent("기타 정보", k -> new LinkedHashMap<>());
+                        details.put(translatedCategory, fcstValue);
+                    }
                 }
             }
         }
-        return result;
+        return dailyWeather;
     }
 
-    private String extractValue(String line, String startTag, String endTag){
-        try{
+    private String extractValue(String line, String startTag, String endTag) {
+        try {
             int startIndex = line.indexOf(startTag);
-            if(startIndex == -1) return null;
+            if (startIndex == -1) return null;
             startIndex += startTag.length();
             int endIndex = line.indexOf(endTag, startIndex);
             return (endIndex == -1) ? null : line.substring(startIndex, endIndex);
-        } catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
