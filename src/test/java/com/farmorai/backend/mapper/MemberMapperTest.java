@@ -35,7 +35,8 @@ class MemberMapperTest {
                 MemberRole.USER,
                 "address",
                 null,
-                null
+                null,
+                false
         );
     }
 
