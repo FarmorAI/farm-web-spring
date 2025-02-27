@@ -1,0 +1,89 @@
+package com.farmorai.backend.service;
+
+import com.farmorai.backend.dto.*;
+import com.farmorai.backend.mapper.InquiryMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class InquiryService {
+    private final InquiryMapper inquiryMapper;
+    private final MemberService memberService;
+
+    public PageResponseDto<InquiryDto> getInquiryList(PageRequestDto pageRequestDto) {
+        List<InquiryDto> inquiryList = inquiryMapper.getInquiryList(pageRequestDto);
+        int totalCount = inquiryMapper.getInquiryListCnt();
+
+        // 각 InquiryDto 항목에 대해 한글 카테고리 설정
+        for (InquiryDto inquiryDto : inquiryList) {
+            if (inquiryDto.getCategory() != null) {
+                String korean = inquiryDto.getCategory().getKorean();
+                inquiryDto.setCategoryKor(korean);
+            }
+        }
+        return PageResponseDto.<InquiryDto>builder()
+                .dtoList(inquiryList)
+                .pageRequestDto(pageRequestDto)
+                .total(totalCount)
+                .build();
+    }
+
+    // 문의글 조회
+    public InquiryDto getInquiryById(Long inquiryId) {
+        InquiryDto inquiryDto = inquiryMapper.getInquiryById(inquiryId);
+        String korean = inquiryDto.getCategory().getKorean();
+        inquiryDto.setCategoryKor(korean);
+        inquiryMapper.increaseViewCnt(inquiryId);
+
+        return inquiryDto;
+    }
+
+    // 문의 추가
+    public ResponseEntity<String> insertInquiry(InquiryDto inquiryDto) {
+        String email = getCurrentUsername();
+
+        if(email != null) {
+            MemberDto memberDto = memberService.getMemberByEmail(email);
+            inquiryDto.setMemberId(memberDto.getMemberId());
+            inquiryDto.setWriter(memberDto.getNickname());
+        }
+
+        // Category 영문 입력
+        InquiryCategory category = InquiryCategory.fromKorean(inquiryDto.getCategoryKor());
+        inquiryDto.setCategory(category);
+
+        inquiryMapper.insertInquiry(inquiryDto);
+        return ResponseEntity.ok("Success");
+    }
+
+    // 문의 수정
+    public void updateInquiry(InquiryDto inquiryDto) {
+        // Category 영문 입력
+        InquiryCategory category = InquiryCategory.fromKorean(inquiryDto.getCategoryKor());
+        inquiryDto.setCategory(category);
+
+        inquiryMapper.updateInquiry(inquiryDto);
+    }
+
+    // 문의 삭제
+    public void deleteInquiry(Long inquiryId) {
+        inquiryMapper.deleteInquiry(inquiryId);
+    }
+
+    // 유저 정보 가져오기
+    public String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return userDetails.getUsername();
+        }
+        return null;
+    }
+}
