@@ -3,19 +3,19 @@ package com.farmorai.backend.controller;
 import com.farmorai.backend.dto.InquiryDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
+import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
 import com.farmorai.backend.service.InquiryService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/inquiry")
 @RequiredArgsConstructor
 public class InquiryController {
     private final InquiryService inquiryService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/list")
     public ResponseEntity<PageResponseDto<InquiryDto>> getInquiryList(PageRequestDto pageRequestDto) {
@@ -28,7 +28,10 @@ public class InquiryController {
     }
 
     @PostMapping
-    public ResponseEntity<String> insertInquiry(@RequestBody InquiryDto inquiryDto) {
+    public ResponseEntity<String> insertInquiry(
+            @RequestBody InquiryDto inquiryDto,
+            HttpServletRequest req
+    ) {
         inquiryService.insertInquiry(inquiryDto);
         return ResponseEntity.ok("Success");
     }
@@ -39,9 +42,9 @@ public class InquiryController {
         return ResponseEntity.ok("Success");
     }
 
-    @DeleteMapping("/{inquiry}")
-    public ResponseEntity<String> deleteInquiry(@PathVariable Long inquiry_id) {
-        inquiryService.deleteInquiry(inquiry_id);
+    @DeleteMapping("/{inquiryId}")
+    public ResponseEntity<String> deleteInquiry(@PathVariable("inquiryId") Long inquiryId) {
+        inquiryService.deleteInquiry(inquiryId);
         return ResponseEntity.ok("Success");
     }
 }

@@ -10,13 +10,14 @@ import java.util.List;
 public interface InquiryMapper {
 
     List<InquiryDto> getInquiryList(PageRequestDto pageRequestDto);
-    int getInquiryListCount();
+    int getInquiryListCnt();
 
     InquiryDto getInquiryById(Long inquiryId);
+    void increaseViewCnt(Long inquiryId);
 
     void insertInquiry(InquiryDto inquiryDto);
 
     void updateInquiry(InquiryDto inquiryDto);
 
-    void deleteInquiry(Long inquiry_id);
+    void deleteInquiry(Long inquiryId);
 }

@@ -5,17 +5,8 @@
 <mapper namespace="com.farmorai.backend.mapper.InquiryMapper">
     <!-- 전체 문의 조회 -->
     <select id="getInquiryList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.InquiryDto">
-        SELECT
-            i.inquiry_id,
-            i.title,
-            i.content,
-            i.category,
-            i.created_at,
-            i.updated_at,
-            i.views,
-            m.nickname as writer
-        FROM inquiry i
-        LEFT JOIN member m ON i.member_id = m.member_id
+        SELECT inquiry_id, title, content, category,
+            created_at, updated_at, views, member_id, writer FROM inquiry
         <where>
             1=1
             <if test="title != null and title != ''">
@@ -25,35 +16,33 @@
                 AND content LIKE CONCAT('%', #{content}, '%')
             </if>
         </where>
-        ORDER BY i.inquiry_id DESC
+        ORDER BY inquiry_id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
     <!-- 데이터 개수 조회 -->
-    <select id="getInquiryListCount" resultType="int">
+    <select id="getInquiryListCnt" resultType="int">
         SELECT COUNT(*) FROM inquiry
     </select>
 
+    <!-- 조회수 증가 -->
+    <update id="increaseViewCnt" parameterType="java.lang.Long">
+        UPDATE inquiry
+        SET views = views + 1
+        WHERE inquiry_id = #{inquiryId}
+    </update>
+
     <!-- 문의 조회 by ID -->
     <select id="getInquiryById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.InquiryDto">
-        SELECT
-            i.inquiry_id,
-            i.title,
-            i.content,
-            i.category,
-            i.created_at,
-            i.updated_at,
-            i.views,
-            m.nickname as writer
-        FROM inquiry i
-        LEFT JOIN member m ON i.member_id = m.member_id
+        SELECT inquiry_id, title, content, category,
+            created_at, updated_at, views, writer FROM inquiry
         WHERE inquiry_id = #{inquiryId}
     </select>
 
     <!-- 문의 추가 -->
     <insert id="insertInquiry" parameterType="com.farmorai.backend.dto.InquiryDto">
-        INSERT INTO inquiry (title, content, category, member_id)
-        VALUES (#{title}, #{content}, #{category}, #{memberId})
+        INSERT INTO inquiry (title, content, category, writer)
+        VALUES (#{title}, #{content}, #{category}, #{writer})
     </insert>
 
     <!-- 문의 수정 -->
@@ -63,7 +52,7 @@
         title = #{title},
         content = #{content},
         category = #{category},
-        updated_at = NOW()
+        writer = #{writer}
         WHERE inquiry_id = #{inquiryId}
     </update>
 
