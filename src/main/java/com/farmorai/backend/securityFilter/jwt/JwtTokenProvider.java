@@ -32,20 +32,24 @@ public class JwtTokenProvider {
         this.tokenValidityTime = tokenValidityInTime;
     }
 
-    // JWT 생성
-    public String createJwtToken(String email, String role, String nickname) {
-        long now = System.currentTimeMillis();                 // 현재 시간(ms)
+
+    // JWT 생성 (memberId 추가)
+    public String createJwtToken(Long memberId, String email, String role, String nickname) {
+        long now = System.currentTimeMillis();  // 현재 시간(ms)
 
         return Jwts.builder()
-                .claim("email", email)                      // "email"로 이메일 정보 추가
-                .claim("nickname", nickname)                // "email"로 이메일 정보 추가
-                .claim("role", role)                        // "auth"로 권한 정보 추가
-                .setIssuedAt(new Date(now))                       // 토큰 발급 시간 설정
-                .setExpiration(new Date(now + tokenValidityTime)) // 토큰 만료 시간 설정
-                .signWith(secretKey, SignatureAlgorithm.HS256)    // JWT 서명 (시크릿 키로 서명)
-                .compact();                                       // JWT 토큰을 문자열로 반환
+                .claim("memberId", memberId)  // "memberId" 추가
+                .claim("email", email)
+                .claim("nickname", nickname)
+                .claim("role", role)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + tokenValidityTime))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
+    // member_id 조회
+    public Long getMemberId(String token) { return parseClaims(token).get("memberId",Long.class); }
 
     // email 조회
     public String getEmail(String token) {

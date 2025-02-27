@@ -44,6 +44,7 @@ public class JwtAuthStrategy implements AuthStrategy {
 
         // JWT 토큰 생성 및 "Header"에 추가
         String token = jwtTokenProvider.createJwtToken(
+                userDetails.getMemberId(),
                 userDetails.getUsername(),
                 userDetails.getAuthorities().iterator().next().getAuthority(),
                 userDetails.getNickname()

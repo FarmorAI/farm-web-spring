@@ -1,5 +1,6 @@
 package com.farmorai.backend.securityFilter.jwt;
 
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -84,11 +85,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Authentication 토큰 생성
     private Authentication createAuth(String token) {
+        Long memberId = jwtTokenProvider.getMemberId(token);
         String email = jwtTokenProvider.getEmail(token);  // token -> email
         String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
-        User principal = new User(email, "", auth);
+        CustomUserDetails principal = new CustomUserDetails(memberId,email, "", auth, nickname);
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()

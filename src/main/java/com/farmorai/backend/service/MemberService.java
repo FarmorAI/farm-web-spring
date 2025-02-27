@@ -82,7 +82,7 @@ public class MemberService {
         return socialMember;
     }
 
-
+    //소셜 로그인 구글
     public MemberDto getGoogleMember(String accessToken) {
         String googleGetUserURL = "https://www.googleapis.com/oauth2/v3/userinfo";
         RestTemplate restTemplate = new RestTemplate();

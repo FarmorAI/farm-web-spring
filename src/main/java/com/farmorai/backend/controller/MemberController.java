@@ -1,7 +1,10 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
+import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.farmorai.backend.service.MemberService;
@@ -17,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 전체 회원 조회
     @GetMapping(value = "/admin/members")
@@ -78,4 +82,28 @@ public class MemberController {
         memberService.deleteMember(memberId);
         return "success";
     }
+
+    //JWT 토큰을 이용해서 사용자 정보 반환
+    @GetMapping("/user")
+    public ResponseEntity<MemberDto> getUserInfo(HttpServletRequest request) {
+        // Authorization 헤더에서 JWT 토큰 추출
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // "Bearer " 제거 후 토큰 추출
+        String token = authorizationHeader.substring(7);
+        if (jwtTokenProvider.isJwtExpired(token)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        // JWT에서 이메일 추출
+        String email = jwtTokenProvider.getEmail(token);
+        MemberDto member = memberService.getMemberByEmail(email);
+
+        return ResponseEntity.ok(member);
+    }
+
+
 }

@@ -62,6 +62,7 @@ public class SocialController {
         // 헤더에 JWT 토큰 생성 및 추가
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + jwtTokenProvider.createJwtToken(
+                memberDto.getMemberId(),
                 memberDto.getEmail(),
                 memberDto.getMemberRole().name(),
                 memberDto.getNickname()));
@@ -100,6 +101,7 @@ public class SocialController {
         // 🔹 헤더에 JWT 토큰 생성 및 추가
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + jwtTokenProvider.createJwtToken(
+                memberDto.getMemberId(),
                 memberDto.getEmail(),
                 memberDto.getMemberRole().name(),
                 memberDto.getNickname()));
