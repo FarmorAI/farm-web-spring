@@ -42,9 +42,6 @@ public class MemberService {
         return memberMapper.getMemberByEmail(email);
     }
 
-    public MemberDto getMemberByNickname(String nickname) {
-        return memberMapper.getMemberByNickname(nickname);
-    }
 
     // 회원 등록
     public void insertMember(MemberDto memberDto) {
@@ -125,11 +122,10 @@ public class MemberService {
 
 
     private MemberDto makeSocialMember(String nickname){
-        String tempPassword = makeTempPassword();
         return MemberDto.builder()
                 .email(nickname+"@kakao.com")
                 .name("Social Member")
-                .password(passwordEncoder.encode(tempPassword))
+                .password(passwordEncoder.encode(makeTempPassword()))
                 .nickname(nickname)
                 .memberRole(MemberRole.USER)
                 .social(true)

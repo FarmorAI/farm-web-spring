@@ -66,7 +66,7 @@ public class SocialController {
                 memberDto.getMemberRole().name(),
                 memberDto.getNickname()));
 
-        // ResponseEntity로 헤더 + 바디 함께 반환
+        // ResponseEntity 헤더 + 바디 함께 반환
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(kakaoMap);

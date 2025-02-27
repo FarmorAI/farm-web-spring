@@ -4,7 +4,9 @@
 
 <mapper namespace="com.farmorai.backend.mapper.NoticeMapper">
     <select id="getNoticeList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT * FROM notice
+        SELECT n.notice_id, n.title, m.nickname writer, n.content, n.views, n.created_at, n.updated_at
+        FROM notice n
+        inner join member m on n.member_id = m.member_id
         <where>
             1=1
             <if test="title != null and title != ''">
@@ -31,7 +33,9 @@
     </select>
 
     <select id="getNoticeDetail" parameterType="Long" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT notice_id ,title, writer ,content, views, created_at, updated_at  FROM notice WHERE notice_id = #{noticeId}
+        SELECT n.notice_id ,n.title, m.nickname writer, n.content, n.views, n.created_at, n.updated_at
+        FROM notice n inner join member m on n.member_id = m.member_id
+        WHERE notice_id = #{noticeId}
     </select>
 
     <update id="updateNoticeViews" parameterType="Long">
