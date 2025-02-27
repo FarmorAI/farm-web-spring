@@ -18,5 +18,6 @@ public class InquiryDto {
     private String createdAt;
     private String updatedAt;
     private int views;
+    private Long memberId;
     private String writer;
 }
