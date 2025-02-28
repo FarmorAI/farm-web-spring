@@ -14,7 +14,7 @@ spring:
 
   datasource:
     hikari:
-      jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&publicKeyRetrieval=true
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driver-class-name: com.mysql.cj.jdbc.Driver

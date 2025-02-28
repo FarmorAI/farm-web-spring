@@ -26,7 +26,7 @@ public class BoardController {
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;
 
-    @GetMapping
+    @GetMapping("/list")
     public Map<String, Object> getBoardList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -84,7 +84,4 @@ public class BoardController {
         boardService.updateBoard(boardId, boardDto);
         return Map.of("result","success");
     }
-
-
-
 }
