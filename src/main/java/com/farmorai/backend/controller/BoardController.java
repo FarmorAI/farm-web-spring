@@ -1,12 +1,16 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.BoardDto;
+import com.farmorai.backend.dto.NoticeDto;
+import com.farmorai.backend.dto.PageRequestDto;
+import com.farmorai.backend.dto.PageResponseDto;
 import com.farmorai.backend.service.BoardService;
 import com.farmorai.backend.util.FileUploadUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,10 +31,8 @@ public class BoardController {
     private String uploadPath;
 
     @GetMapping("/list")
-    public Map<String, Object> getBoardList(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return boardService.getBoardList(page, size);
+    public ResponseEntity<PageResponseDto<BoardDto>> getNoticeList(PageRequestDto pageRequestDto) {
+        return ResponseEntity.ok(boardService.getBoardList(pageRequestDto));
     }
 
     @GetMapping("/{boardId}")
@@ -84,4 +86,7 @@ public class BoardController {
         boardService.updateBoard(boardId, boardDto);
         return Map.of("result","success");
     }
+
+
+
 }

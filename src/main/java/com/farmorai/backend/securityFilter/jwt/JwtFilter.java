@@ -42,10 +42,9 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-
         // JWT 존재 여부 확인
         if(token == null) {
-            log.debug("No JWT found in request: {}", req.getRequestURI());
+            log.debug("No JWT found in request: {}", requestURI);
             filterChain.doFilter(req, resp);
             return;
         }
