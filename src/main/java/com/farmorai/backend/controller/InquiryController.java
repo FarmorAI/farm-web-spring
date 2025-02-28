@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/inquiry")
+@RequestMapping("api/inquiry")
 @RequiredArgsConstructor
 public class InquiryController {
     private final InquiryService inquiryService;
