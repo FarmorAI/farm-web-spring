@@ -1,6 +1,8 @@
 package com.farmorai.backend.mapper;
 
 import com.farmorai.backend.dto.BoardDto;
+
+import com.farmorai.backend.dto.PageRequestDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -8,8 +10,9 @@ import java.util.List;
 
 @Mapper
 public interface BoardMapper {
-    List<BoardDto> getBoardList(@Param("offset") int offset, @Param("size") int size);
-    int getTotalBoardCount();
+
+    List<BoardDto> getBoardList(PageRequestDto pageRequestDto);
+    int getBoardListCount(PageRequestDto pageRequestDto);
 
     void deleteBoard(Long boardId);
 

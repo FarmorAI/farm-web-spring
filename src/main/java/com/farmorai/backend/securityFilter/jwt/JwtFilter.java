@@ -29,6 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+
+    // API 요청이 들어오면 인증 절차 진행
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
             throws ServletException, IOException {
@@ -93,6 +95,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()
+
         );
     }
 }

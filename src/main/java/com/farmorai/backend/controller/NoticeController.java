@@ -4,27 +4,25 @@ package com.farmorai.backend.controller;
 import com.farmorai.backend.dto.NoticeDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
+
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.NoticeService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
+
 import static org.springframework.http.HttpStatus.*;
+
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notice")
-@Log4j2
 public class NoticeController {
 
     private final NoticeService noticeService;
@@ -49,9 +47,9 @@ public class NoticeController {
         return ResponseEntity.ok("글 등록 성공");
     }
 
+
     @PutMapping("/{noticeId}")
-    public Map<String,String> updateNotice(@PathVariable Long noticeId,
-                                           @RequestBody NoticeDto noticeDto) {
+    public Map<String,String> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeDto noticeDto) {
         noticeService.updateNotice(noticeId, noticeDto);
         return Map.of("result","success");
     }

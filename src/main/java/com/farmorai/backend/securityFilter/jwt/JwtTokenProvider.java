@@ -32,7 +32,6 @@ public class JwtTokenProvider {
         this.tokenValidityTime = tokenValidityInTime;
     }
 
-
     // JWT 생성 (memberId 추가)
     public String createJwtToken(Long memberId, String email, String role, String nickname) {
         long now = System.currentTimeMillis();  // 현재 시간(ms)

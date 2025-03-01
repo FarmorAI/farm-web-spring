@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +23,8 @@ import java.util.Map;
  * @ConditionalOnProperty
  * : spring.auth.strategy 값(jwt)에 따라 Bean 등록 여부를 동적으로 결정
  */
+
+@Log4j2
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.auth.strategy", havingValue = "jwt")
@@ -45,11 +49,14 @@ public class JwtAuthStrategy implements AuthStrategy {
         // JWT 토큰 생성 및 "Header"에 추가
         String token = jwtTokenProvider.createJwtToken(
                 userDetails.getMemberId(),
+
                 userDetails.getUsername(),
                 userDetails.getAuthorities().iterator().next().getAuthority(),
                 userDetails.getNickname()
         );
         resp.addHeader("Authorization", "Bearer " + token);
+
+
     }
 
     /**

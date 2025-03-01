@@ -10,6 +10,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,12 +23,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${NAVERLOGIN_CLIENT_ID}")
+    private String naverClientId;
+    @Value("${NAVERLOGIN_CLIENT_SECRET}")
+    private String naverClientSecret;
+
 
     // 전체 회원 조회
     public List<MemberDto> getAllMember() {
@@ -41,7 +51,6 @@ public class MemberService {
     public MemberDto getMemberByEmail(String email) {
         return memberMapper.getMemberByEmail(email);
     }
-
 
     // 회원 등록
     public void insertMember(MemberDto memberDto) {
@@ -155,6 +164,66 @@ public class MemberService {
 
         return nickname;
     }
+
+    // =======================네이버 소셜 로그인==============================
+    public MemberDto getNaverMember(String accessToken) {
+        // 네이버 API를 호출하여 사용자 프로필 정보 가져오기
+        LinkedHashMap<String, Object> profile = getNaverUserProfile(accessToken);
+        String email = (String) profile.get("email");
+        String nickname = (String) profile.get("nickname");
+
+        // 기존에 DB에 회원 정보가 있는 경우 (이메일을 기준으로 체크)
+        if (memberMapper.checkEmail(email)) {
+            MemberDto memberDto = memberMapper.getMemberByEmail(email);
+            log.info("memberDto = {}", memberDto);
+            return memberDto;
+        }
+
+        // DB에 회원 정보가 없는 경우 신규 회원 등록
+        MemberDto socialMember = makeSocialMemberForNaver(email, nickname);
+        memberMapper.insertMember(socialMember);
+        return socialMember;
+    }
+
+    // 네이버 API를 호출하여 사용자 프로필 정보 추출 (response 에는 email, nickname 등 포함)
+    private LinkedHashMap<String, Object> getNaverUserProfile(String accessToken) {
+        String naverGetUserURL = "https://openapi.naver.com/v1/nid/me";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-Type", "application/json");
+        // 클라이언트 ID와 Secret을 헤더에 추가 (필요한 경우)
+        headers.add("X-Naver-Client-Id", naverClientId);
+        headers.add("X-Naver-Client-Secret", naverClientSecret);
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(naverGetUserURL).build();
+
+        LinkedHashMap<String, Object> naverResult = restTemplate.exchange(uriComponents.toUri(), HttpMethod.GET, entity, LinkedHashMap.class).getBody();
+
+        log.info("Naver response: {}", naverResult);
+
+        // 네이버 API 응답 형식: { "resultcode": "00", "message": "success", "response": { ... } }
+        LinkedHashMap<String, Object> profile = (LinkedHashMap<String, Object>) naverResult.get("response");
+
+        return profile;
+    }
+
+    private MemberDto makeSocialMemberForNaver(String email, String nickname) {
+        String tempPassword = makeTempPassword();
+        log.info("tempPassword = {}", tempPassword);
+        return MemberDto.builder()
+                .email(email)
+                .name("Social Member")
+                .password(passwordEncoder.encode(tempPassword))
+                .nickname(nickname)
+                .memberRole(MemberRole.USER)
+                .social(true)
+                .build();
+    }
+    //==============================================================================
 
     private String makeTempPassword() {
         StringBuilder buffer = new StringBuilder();

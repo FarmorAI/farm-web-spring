@@ -39,6 +39,7 @@ public class NoticeService {
     @Transactional
     public void insertNotice(Long memberId,NoticeDto noticeDto) {
         noticeMapper.insertNotice(memberId,noticeDto);
+
     }
 
     @Transactional
