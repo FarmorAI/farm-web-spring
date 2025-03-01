@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -85,16 +84,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Authentication 토큰 생성
     private Authentication createAuth(String token) {
+        Long memberId = jwtTokenProvider.getMemberId(token);
         String email = jwtTokenProvider.getEmail(token);  // token -> email
         String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
-
-        // Custom 된 User 객체 생성
-        CustomUserDetails userDetails = new CustomUserDetails(email, "", auth, nickname);
+        CustomUserDetails principal = new CustomUserDetails(memberId,email, "", auth, nickname);
 
         return new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
+                principal, null, principal.getAuthorities()
+
+
         );
     }
 }

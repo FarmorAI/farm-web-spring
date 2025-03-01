@@ -18,7 +18,7 @@ public class NoticeDto {
 
     private String content;
 
-    private Long memberId;
+    private String writer;
 
     private int views;
 

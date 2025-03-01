@@ -33,6 +33,7 @@ public class MemberDetailsService implements UserDetailsService {
 
         // Member 인증을 위한 User 객체 생성
         return new CustomUserDetails(
+                memberDto.getMemberId(),
                 memberDto.getEmail(),
                 memberDto.getPassword(),
                 Collections.singleton(authority),
