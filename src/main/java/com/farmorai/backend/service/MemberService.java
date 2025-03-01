@@ -6,6 +6,7 @@ import com.farmorai.backend.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import java.util.Map;
 
 
@@ -35,7 +37,6 @@ public class MemberService {
     private String naverClientId;
     @Value("${NAVERLOGIN_CLIENT_SECRET}")
     private String naverClientSecret;
-
 
     // 전체 회원 조회
     public List<MemberDto> getAllMember() {

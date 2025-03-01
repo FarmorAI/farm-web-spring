@@ -5,6 +5,7 @@ import com.farmorai.backend.dto.BoardDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
 
+
 import com.farmorai.backend.service.BoardService;
 import com.farmorai.backend.util.FileUploadUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +31,6 @@ public class BoardController {
 
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;
-
 
     @GetMapping("/list")
     public ResponseEntity<PageResponseDto<BoardDto>> getNoticeList(PageRequestDto pageRequestDto) {

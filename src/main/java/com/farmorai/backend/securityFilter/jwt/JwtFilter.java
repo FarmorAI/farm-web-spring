@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -28,7 +27,6 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-
 
     // API 요청이 들어오면 인증 절차 진행
     @Override
@@ -95,6 +93,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()
+
 
         );
     }

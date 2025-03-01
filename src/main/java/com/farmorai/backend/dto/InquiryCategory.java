@@ -1,7 +1,6 @@
 package com.farmorai.backend.dto;
 
 public enum InquiryCategory {
-
     GENERAL("일반 문의"),
     BILLING("결제 문의"),
     TECHNICAL("서비스 이용 문의"),
