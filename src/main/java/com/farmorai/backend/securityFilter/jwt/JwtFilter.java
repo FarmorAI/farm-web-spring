@@ -1,5 +1,6 @@
 package com.farmorai.backend.securityFilter.jwt;
 
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    // API 요청이 들어오면 인증 절차 진행
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
             throws ServletException, IOException {
@@ -42,10 +44,9 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-
         // JWT 존재 여부 확인
         if(token == null) {
-            log.debug("No JWT found in request: {}", req.getRequestURI());
+            log.debug("No JWT found in request: {}", requestURI);
             filterChain.doFilter(req, resp);
             return;
         }
@@ -88,10 +89,12 @@ public class JwtFilter extends OncePerRequestFilter {
         String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
-        User principal = new User(email, "", auth);
+
+        // Custom 된 User 객체 생성
+        CustomUserDetails userDetails = new CustomUserDetails(email, "", auth, nickname);
 
         return new UsernamePasswordAuthenticationToken(
-                principal, null, principal.getAuthorities()
+                userDetails, null, userDetails.getAuthorities()
         );
     }
 }

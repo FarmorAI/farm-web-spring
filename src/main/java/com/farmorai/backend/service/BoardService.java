@@ -1,6 +1,9 @@
 package com.farmorai.backend.service;
 
 import com.farmorai.backend.dto.BoardDto;
+import com.farmorai.backend.dto.NoticeDto;
+import com.farmorai.backend.dto.PageRequestDto;
+import com.farmorai.backend.dto.PageResponseDto;
 import com.farmorai.backend.mapper.BoardMapper;
 import com.farmorai.backend.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -17,9 +22,15 @@ public class BoardService {
     private final BoardMapper boardMapper;
     private final FileUploadUtil fileUploadUtil;
 
-    public List<BoardDto> getBoardList(){
-        return boardMapper.getBoardList();
-    };
+    public PageResponseDto<BoardDto> getBoardList(PageRequestDto pageRequestDto) {
+        List<BoardDto> boardList = boardMapper.getBoardList(pageRequestDto);
+        int totalCount = boardMapper.getBoardListCount(pageRequestDto);
+        return PageResponseDto.<BoardDto>builder()
+                .dtoList(boardList)
+                .pageRequestDto(pageRequestDto)
+                .total(totalCount)
+                .build();
+    }
 
     @Transactional
     public void deleteBoard(Long boardId) {
