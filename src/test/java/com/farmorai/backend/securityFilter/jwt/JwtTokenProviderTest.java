@@ -19,11 +19,7 @@ class JwtTokenProviderTest {
     private SecretKey secretKey;
     private final String SECRET = "dGVzdHNlY3JldGtleXRlc3RzZWNyZXRrZXl0ZXN0c2VjcmV0a2V5"; // Base64 encoded "testsecretkeytestsecretkeytestsecretkey"
     private final long VALIDITY = 36000000;  // 1시간(ms)
-<<<<<<< HEAD
     private Long memberId = 3L;
-=======
-
->>>>>>> develop
     private String email = "test@example.com";
     private String role = "ADMIN";
     private String nickname = "testName";
@@ -36,12 +32,7 @@ class JwtTokenProviderTest {
 
     @Test
     void createJwtToken() {
-<<<<<<< HEAD
         String token = jwtTokenProvider.createJwtToken(memberId,email, role, nickname);
-=======
-        String token = jwtTokenProvider.createJwtToken(email, role, nickname);
->>>>>>> develop
-
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
 
@@ -55,11 +46,7 @@ class JwtTokenProviderTest {
     @Test
     void isJwtExpired() {
         JwtTokenProvider expiredProvider = new JwtTokenProvider(SECRET, -1);
-<<<<<<< HEAD
         String token = expiredProvider.createJwtToken(memberId,email, role, nickname);
-=======
-        String token = expiredProvider.createJwtToken(email, role, nickname);
->>>>>>> develop
         boolean isExpired = expiredProvider.isJwtExpired(token);
         assertTrue(isExpired);
     }
