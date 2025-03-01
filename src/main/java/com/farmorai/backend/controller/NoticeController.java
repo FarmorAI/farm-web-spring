@@ -42,8 +42,6 @@ public class NoticeController {
     @PostMapping
     public ResponseEntity<?> insertNotice(@AuthenticationPrincipal CustomUserDetails userDetails, //로그인한 사용자 정보를 가져옵니다.
                                            @RequestBody NoticeDto noticeDto) {
-        log.info(userDetails);
-        log.info(SecurityContextHolder.getContext().getAuthentication());
         if(userDetails == null || !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROLE_ADMIN"))){
             return ResponseEntity.status(FORBIDDEN).body("관리자만 글 등록이 가능합니다.");
         }
