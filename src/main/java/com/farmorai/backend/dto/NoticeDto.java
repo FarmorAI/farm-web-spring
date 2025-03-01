@@ -18,13 +18,13 @@ public class NoticeDto {
 
     private String content;
 
-    private String writer;
+    private Long memberId;
 
     private int views;
 
     private String createdAt;
 
-    private String modifiedAt;
+    private String updatedAt;
 
 
 }
