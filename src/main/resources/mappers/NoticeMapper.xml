@@ -31,7 +31,18 @@
     </select>
 
     <select id="getNoticeDetail" parameterType="Long" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT notice_id ,title, writer ,content, views, created_at, updated_at  FROM notice WHERE notice_id = #{noticeId}
+        SELECT
+            n.notice_id,
+            n.title,
+            n.member_id,
+            m.nickname, -- ✅ 작성자의 닉네임 추가
+            n.content,
+            n.views,
+            n.created_at,
+            n.updated_at
+        FROM notice n
+                 JOIN member m ON n.member_id = m.member_id -- ✅ member 테이블과 조인
+        WHERE n.notice_id = #{noticeId};
     </select>
 
     <update id="updateNoticeViews" parameterType="Long">
@@ -39,7 +50,7 @@
     </update>
 
     <insert id="insertNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
-        INSERT INTO notice (title, content, writer, created_at, updated_at) VALUES (#{title}, #{content}, #{writer}, now(),now())
+        INSERT INTO notice (title, content, member_id, created_at, updated_at) VALUES (#{title}, #{content}, #{memberId}, now(),now())
     </insert>
 
     <update id="updateNotice" parameterType="com.farmorai.backend.dto.NoticeDto">

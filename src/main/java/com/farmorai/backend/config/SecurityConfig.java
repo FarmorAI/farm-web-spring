@@ -113,7 +113,7 @@ public class SecurityConfig {
         corsConfig.addAllowedMethod("*");        // 모든 HTTP 메소드 허용
         corsConfig.setAllowedOriginPatterns(List.of("*")); // 모든 도메인 허용
 
-        // ✅ Authorization 헤더를 클라이언트에서 접근 가능하도록 설정
+        // Authorization 헤더를 클라이언트에서 접근 가능하도록 설정
         corsConfig.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

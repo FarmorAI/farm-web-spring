@@ -24,7 +24,7 @@ public class BoardController {
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;
 
-    @GetMapping
+    @GetMapping("/list")
     public List<BoardDto> getBoardList(){
         return boardService.getBoardList();
     }
