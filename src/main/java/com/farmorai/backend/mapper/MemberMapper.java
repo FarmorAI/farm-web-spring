@@ -2,6 +2,7 @@ package com.farmorai.backend.mapper;
 
 import com.farmorai.backend.dto.MemberDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +25,5 @@ public interface MemberMapper {
 
     boolean checkEmail(String email);
 
+    void updateProfileImage(@Param("memberId") Long memberId, @Param("imageUrl") String imageUrl);
 }
