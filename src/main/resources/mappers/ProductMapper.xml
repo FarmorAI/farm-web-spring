@@ -4,12 +4,21 @@
 
 <mapper namespace="com.farmorai.backend.mapper.ProductMapper">
 
-    <insert id="registerProduct" parameterType="com.farmorai.backend.dto.ProductDto">
-        INSERT INTO product (product_name, product_price, product_stock, product_description, product_image,product_created_at, product_updated_at)
-        VALUES (#{productName}, #{productPrice}, #{productStock}, #{productDescription}, #{productImage}, now(), now())
+    <insert id="registerProduct" parameterType="com.farmorai.backend.dto.ProductDto" useGeneratedKeys="true" keyProperty="productId">
+        INSERT INTO product (name, variety, price, stock, description, image_url,created_at, updated_at)
+        VALUES (#{name}, #{variety} ,#{price}, #{stock}, #{description}, #{imageUrl}, now(), now())
     </insert>
 
 
+    <select id="getProductList">
+        select *
+        from product
+    </select>
 
+    <select id="getProductById" resultType="com.farmorai.backend.dto.ProductDto" parameterType="Long">
+        select *
+        from product
+        where product_id = #{productId}
+    </select>
 
 </mapper>
