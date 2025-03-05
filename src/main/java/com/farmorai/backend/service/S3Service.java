@@ -37,11 +37,9 @@ public class S3Service {
     public String uploadFile(MultipartFile file){
         String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename(); // 파일명 중복 방지
         try {
-
             s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(fileName).build()
                     , RequestBody.fromBytes(file.getBytes()));
             log.info("files uploaded to S3: {}", fileName);
-
             return getPublicUrl(fileName);
         } catch (S3Exception | IOException e) {
             log.error("파일 업로드 실패 : {}",e.getMessage());
@@ -53,7 +51,7 @@ public class S3Service {
     /**
      * S3에 파일 삭제
      * @param fileName
-     * @return
+     * @return fileName
      */
     public String deleteFile(String fileName){
         try{
