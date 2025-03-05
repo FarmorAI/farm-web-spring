@@ -18,6 +18,7 @@ public class MemberDto {
     private String phone;
     private String birthDate;
     private MemberRole memberRole;
+    private String imageUrl;
     private String address;
     private String createdAt;
     private String updatedAt;

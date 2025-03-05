@@ -50,8 +50,6 @@
         UPDATE notice
         SET title = #{notice.title}, content = #{notice.content}, updated_at = now()
         WHERE notice_id = #{noticeId}
-        AND member_id = #{memberId}
-        AND EXISTS(SELECT 1 FROM member WHERE member_id = #{notice.memberId} AND member_role = 'ADMIN')
     </update>
 
     <delete id="deleteNotice" parameterType="Long">

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,11 +33,22 @@ import java.util.Map;
 public class MemberService {
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     @Value("${NAVERLOGIN_CLIENT_ID}")
     private String naverClientId;
     @Value("${NAVERLOGIN_CLIENT_SECRET}")
     private String naverClientSecret;
+
+    // 프로필 이미지 업로드
+    public String updateProfileImage(MultipartFile profileImage, Long memberId) {
+
+        // S3에 이미지 업로드
+        String imageUrl = s3Service.uploadFile(profileImage);
+        memberMapper.updateProfileImage(memberId, imageUrl);
+
+        return imageUrl;
+    }
 
     // 전체 회원 조회
     public List<MemberDto> getAllMember() {

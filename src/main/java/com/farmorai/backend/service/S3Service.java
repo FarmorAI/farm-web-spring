@@ -31,22 +31,43 @@ public class S3Service {
 
     /**
      * S3에 파일 업로드
+     * @param file
+     * @return
      */
     public String uploadFile(MultipartFile file){
         String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename(); // 파일명 중복 방지
         try {
-
             s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(fileName).build()
                     , RequestBody.fromBytes(file.getBytes()));
             log.info("files uploaded to S3: {}", fileName);
-
             return getPublicUrl(fileName);
-        } catch (IOException e) {
+        } catch (S3Exception | IOException e) {
             log.error("파일 업로드 실패 : {}",e.getMessage());
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.",e);
         }
 
     }
+
+    /**
+     * S3에 파일 삭제
+     * @param fileName
+     * @return fileName
+     */
+    public String deleteFile(String fileName){
+        try{
+            s3Client.deleteObject(builder -> builder.bucket(bucket).key(getPublicUrl(fileName)));
+            log.info("files deleted from S3: {}", fileName);
+            return getPublicUrl(fileName);
+        }catch (S3Exception e){
+            log.error("파일 삭제 실패 : {}",e.getMessage());
+            throw new RuntimeException("파일 삭제 중 오류가 발생했습니다.",e);
+        }
+
+    }
+
+
+
+
 
     private String getPublicUrl(String fileName) {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket,region,fileName);

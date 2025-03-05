@@ -2,17 +2,22 @@ package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
 
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.farmorai.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -133,5 +138,20 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
+    //회원 프로필 이미지 업로드
+    @PatchMapping("/auth/upload-profile")
+    public ResponseEntity<?> uploadProfileImage(@RequestParam("profileImage") MultipartFile profileImage,
+                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        try {
+            String imageUrl = memberService.updateProfileImage(profileImage, userDetails.getMemberId());
+            return ResponseEntity.ok(Collections.singletonMap("imageUrl", imageUrl));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "프로필 이미지 업데이트 실패"));
+        }
+    }
+
 
 }
+
