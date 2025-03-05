@@ -51,9 +51,6 @@ public class WeatherService {
 
         final URI uri = URI.create(uriString);
 
-        logger.info("🔑 API Key: {}", apiKey);
-        logger.info("🛠 최종 요청 URL: {}", uri);
-
         return restTemplate.getForObject(uri, String.class);
     }
 
@@ -71,6 +68,7 @@ public class WeatherService {
         categoryMapping.put("SKY", "하늘상태");
         categoryMapping.put("REH", "습도");
         categoryMapping.put("POP", "강수 확률");
+        categoryMapping.put("TMP","오늘 기온");
         Set<String> targetCategories = categoryMapping.keySet();
 
         // 날짜별 결과 저장할 Map
