@@ -1,9 +1,11 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.BoardDto;
-import com.farmorai.backend.dto.NoticeDto;
+
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
+
+
 import com.farmorai.backend.service.BoardService;
 import com.farmorai.backend.util.FileUploadUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;

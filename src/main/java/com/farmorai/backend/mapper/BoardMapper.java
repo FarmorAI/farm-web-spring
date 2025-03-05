@@ -1,7 +1,6 @@
 package com.farmorai.backend.mapper;
 
 import com.farmorai.backend.dto.BoardDto;
-import com.farmorai.backend.dto.NoticeDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -10,6 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface BoardMapper {
+
     List<BoardDto> getBoardList(PageRequestDto pageRequestDto);
     int getBoardListCount(PageRequestDto pageRequestDto);
 

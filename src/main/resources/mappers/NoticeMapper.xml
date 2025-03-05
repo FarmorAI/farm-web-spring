@@ -4,7 +4,9 @@
 
 <mapper namespace="com.farmorai.backend.mapper.NoticeMapper">
     <select id="getNoticeList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT * FROM notice
+        SELECT n.notice_id, n.title, m.nickname writer, n.content, n.views, n.created_at, n.updated_at
+        FROM notice n
+        inner join member m on n.member_id = m.member_id
         <where>
             1=1
             <if test="title != null and title != ''">
@@ -31,19 +33,25 @@
     </select>
 
     <select id="getNoticeDetail" parameterType="Long" resultType="com.farmorai.backend.dto.NoticeDto">
-        SELECT notice_id ,title, writer ,content, views, created_at, updated_at  FROM notice WHERE notice_id = #{noticeId}
+        SELECT n.notice_id ,n.title, m.nickname writer, n.content, n.views, n.created_at, n.updated_at
+        FROM notice n inner join member m on n.member_id = m.member_id
+        WHERE notice_id = #{noticeId}
     </select>
 
     <update id="updateNoticeViews" parameterType="Long">
         UPDATE notice SET views = views + 1 WHERE notice_id = #{noticeId}
     </update>
 
-    <insert id="insertNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
-        INSERT INTO notice (title, content, writer, created_at, updated_at) VALUES (#{title}, #{content}, #{writer}, now(),now())
+    <insert id="insertNotice">
+        INSERT INTO notice (title, content, member_id, created_at, updated_at) VALUES (#{notice.title}, #{notice.content}, #{memberId}, now(),now())
     </insert>
 
     <update id="updateNotice" parameterType="com.farmorai.backend.dto.NoticeDto">
-        UPDATE notice SET title = #{notice.title}, content = #{notice.content}, updated_at = now() WHERE notice_id = #{noticeId}
+        UPDATE notice
+        SET title = #{notice.title}, content = #{notice.content}, updated_at = now()
+        WHERE notice_id = #{noticeId}
+        AND member_id = #{memberId}
+        AND EXISTS(SELECT 1 FROM member WHERE member_id = #{notice.memberId} AND member_role = 'ADMIN')
     </update>
 
     <delete id="deleteNotice" parameterType="Long">

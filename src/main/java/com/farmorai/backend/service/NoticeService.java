@@ -37,8 +37,8 @@ public class NoticeService {
 
 
     @Transactional
-    public void insertNotice(NoticeDto noticeDto) {
-        noticeMapper.insertNotice(noticeDto);
+    public void insertNotice(Long memberId,NoticeDto noticeDto) {
+        noticeMapper.insertNotice(memberId,noticeDto);
     }
 
     @Transactional

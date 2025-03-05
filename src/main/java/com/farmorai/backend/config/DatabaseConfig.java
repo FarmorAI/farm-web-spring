@@ -1,4 +1,4 @@
-package com.farmorai.backend;
+package com.farmorai.backend.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

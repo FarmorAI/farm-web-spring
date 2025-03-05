@@ -22,7 +22,7 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("api/board/file")
+@RequestMapping("/api/board/file")
 public class BoardFileController {
 
     private final FileUploadUtil fileUploadUtil;

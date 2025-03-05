@@ -1,5 +1,6 @@
 package com.farmorai.backend.securityFilter.jwt;
 
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -28,6 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    // API 요청이 들어오면 인증 절차 진행
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain filterChain)
             throws ServletException, IOException {
@@ -83,14 +84,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Authentication 토큰 생성
     private Authentication createAuth(String token) {
+        Long memberId = jwtTokenProvider.getMemberId(token);
         String email = jwtTokenProvider.getEmail(token);  // token -> email
         String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
-        User principal = new User(email, "", auth);
+        CustomUserDetails principal = new CustomUserDetails(memberId,email, "", auth, nickname);
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()
+
+
         );
     }
 }

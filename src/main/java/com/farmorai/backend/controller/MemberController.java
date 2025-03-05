@@ -1,13 +1,17 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
-import com.farmorai.backend.service.MemberService;
+
 import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.extern.slf4j.Slf4j;
+import com.farmorai.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.Map;
@@ -106,4 +110,28 @@ public class MemberController {
         memberService.deleteMember(memberId);
         return ResponseEntity.noContent().build();
     }
+
+    //JWT 토큰을 이용해서 사용자 정보 반환
+    @GetMapping("/user")
+    public ResponseEntity<MemberDto> getUserInfo(HttpServletRequest request) {
+        // Authorization 헤더에서 JWT 토큰 추출
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // "Bearer " 제거 후 토큰 추출
+        String token = authorizationHeader.substring(7);
+        if (jwtTokenProvider.isJwtExpired(token)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        // JWT에서 이메일 추출
+        String email = jwtTokenProvider.getEmail(token);
+        MemberDto member = memberService.getMemberByEmail(email);
+
+        return ResponseEntity.ok(member);
+    }
+
+
 }

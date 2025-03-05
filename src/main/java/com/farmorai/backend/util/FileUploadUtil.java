@@ -29,7 +29,7 @@ public class FileUploadUtil {
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;
 
-    @PostConstruct
+    @PostConstruct //Spring Bean이 생성되면 실행됩니다.
     public void init(){
         File tempFolder = new File(uploadPath);
 
