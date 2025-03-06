@@ -85,4 +85,8 @@
         UPDATE member SET image_url = #{imageUrl} WHERE member_id = #{memberId}
     </update>
 
+    <select id="findEmail" resultType="string">
+        SELECT email FROM member WHERE name = #{name} AND phone = #{phone}
+    </select>
+
 </mapper>

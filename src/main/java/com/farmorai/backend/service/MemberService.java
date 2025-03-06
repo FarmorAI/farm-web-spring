@@ -257,4 +257,7 @@ public class MemberService {
     }
 
 
+    public String findEmail(String name, String phone) {
+        return memberMapper.findEmail(name,phone);
+    }
 }
