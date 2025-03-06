@@ -10,6 +10,7 @@ import com.farmorai.backend.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,7 @@ public class NoticeController {
 
 
     @PutMapping("/{noticeId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Map<String,String> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeDto noticeDto) {
         noticeService.updateNotice(noticeId, noticeDto);
         return Map.of("result","success");

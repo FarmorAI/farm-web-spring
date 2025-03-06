@@ -54,21 +54,12 @@ public class InquiryService {
             inquiryDto.setMemberId(memberDto.getMemberId());
             inquiryDto.setWriter(memberDto.getNickname());
         }
-
-        // Category 영문 입력
-        InquiryCategory category = InquiryCategory.fromKorean(inquiryDto.getCategoryKor());
-        inquiryDto.setCategory(category);
-
         inquiryMapper.insertInquiry(inquiryDto);
         return ResponseEntity.ok("Success");
     }
 
     // 문의 수정
     public void updateInquiry(InquiryDto inquiryDto) {
-        // Category 영문 입력
-        InquiryCategory category = InquiryCategory.fromKorean(inquiryDto.getCategoryKor());
-        inquiryDto.setCategory(category);
-
         inquiryMapper.updateInquiry(inquiryDto);
     }
 

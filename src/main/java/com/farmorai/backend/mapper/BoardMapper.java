@@ -9,7 +9,6 @@ import java.util.List;
 
 @Mapper
 public interface BoardMapper {
-
     List<BoardDto> getBoardList(PageRequestDto pageRequestDto);
     int getBoardListCount(PageRequestDto pageRequestDto);
 
