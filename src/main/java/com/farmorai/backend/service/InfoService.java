@@ -78,13 +78,59 @@ public class InfoService {
 
             List<Map<String, String>> extractedData = parseTechXml(response.getBody(), "item");
 
+            // 추가 요청을 통해 atchmnflUrl 가져오기
+            extractedData.forEach(item -> {
+                String contentId = item.get("contentId");
+                if (contentId != null && !contentId.isEmpty()) {
+                    String atchmnflUrl = fetchTechAtchmnflUrl(contentId);
+                    item.put("url", atchmnflUrl);
+                }
+            });
             return new ResponseEntity<>(extractedData, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // ✅ 특정 콘텐츠 ID로 농업기술 링크 가져오기
+    private String fetchTechAtchmnflUrl(String contentId) {
+        try {
+            String url = UriComponentsBuilder.fromHttpUrl("http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechDtlDefaultInfo")
+                    .queryParam("apiKey", nongsaroApiKey)
+                    .queryParam("srchCurationNo", contentId)
+                    .encode()
+                    .toUriString();
 
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            if (response.getBody() == null) {
+                return "";
+            }
+
+            return parseAtchmnflUrl(response.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+    // ✅ XML에서 atchmnflUrl 추출
+    private String parseAtchmnflUrl(String xmlString){
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
+
+            document.getDocumentElement().normalize();
+            return getTagValue("atchmnflUrl", document.getDocumentElement());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
     // ✅ 농사로 병해충 정보 가져오기
     public ResponseEntity<List<Map<String, String>>> getBugInfo() {
         try {
@@ -112,6 +158,7 @@ public class InfoService {
         }
     }
 
+
     // ✅ XML을 직접 파싱하여 필요한 정보만 추출하는 함수
     private List<Map<String, String>> parseTechXml(String xmlString, String tagName) {
         List<Map<String, String>> resultList = new ArrayList<>();
@@ -135,7 +182,6 @@ public class InfoService {
                     itemMap.put("thumbnailUrl", getTagValue("curationImgUrl", element)); // 썸네일 URL
                     itemMap.put("contentId", getTagValue("curationNo", element)); // 콘텐츠 고유번호
                     itemMap.put("title", getTagValue("curationNm", element)); // 제목
-                    itemMap.put("contentUrl", getTagValue("curationNm", element)); // 제목
 
 
                     resultList.add(itemMap);
