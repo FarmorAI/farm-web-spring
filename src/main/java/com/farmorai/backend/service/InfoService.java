@@ -13,6 +13,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -59,13 +61,14 @@ public class InfoService {
     }
 
     // ✅ 농사로 기술 정보 가져오기 - 농업기술
-    public ResponseEntity<List<Map<String, String>>> getTechInfo() {
+    public ResponseEntity<List<Map<String, String>>> getTechInfo(String query) {
         try {
-            String url = UriComponentsBuilder.fromHttpUrl("http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechLst")
+/*            String url = UriComponentsBuilder.fromHttpUrl("http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechLst")
                     .queryParam("apiKey", nongsaroApiKey) // API 키 추가
+                    .queryParam("srchStr", query)
                     .encode()
-                    .toUriString();
-
+                    .toUriString();*/
+            String url = "http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechLst?apiKey=" + nongsaroApiKey + "&srchStr=사과";
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML)); // XML 응답 요청
 

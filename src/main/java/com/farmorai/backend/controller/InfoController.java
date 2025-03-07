@@ -21,8 +21,8 @@ public class InfoController {
     }
 
     @GetMapping("/tech")
-    public ResponseEntity<List<Map<String, String>>> getTechInfo() {
-        return infoService.getTechInfo();
+    public ResponseEntity<List<Map<String, String>>> getTechInfo(@RequestParam String query) {
+        return infoService.getTechInfo(query);
     }
 
     @GetMapping("/bug")
