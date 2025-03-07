@@ -93,8 +93,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()
-
-
         );
     }
 }

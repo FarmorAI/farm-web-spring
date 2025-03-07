@@ -3,13 +3,18 @@ package com.farmorai.backend.controller;
 import com.farmorai.backend.dto.InquiryDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
 import com.farmorai.backend.service.InquiryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("api/inquiry")
 @RequiredArgsConstructor
@@ -30,9 +35,10 @@ public class InquiryController {
     @PostMapping
     public ResponseEntity<String> insertInquiry(
             @RequestBody InquiryDto inquiryDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest req
     ) {
-        inquiryService.insertInquiry(inquiryDto);
+        inquiryService.insertInquiry(inquiryDto, userDetails);
         return ResponseEntity.ok("Success");
     }
 
@@ -43,7 +49,13 @@ public class InquiryController {
     }
 
     @DeleteMapping("/{inquiryId}")
-    public ResponseEntity<String> deleteInquiry(@PathVariable("inquiryId") Long inquiryId) {
+    public ResponseEntity<String> deleteInquiry(
+            @PathVariable("inquiryId") Long inquiryId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if(userDetails == null) {
+            return ResponseEntity.status(403).body("인증 토큰이 없습니다.");
+        }
         inquiryService.deleteInquiry(inquiryId);
         return ResponseEntity.ok("Success");
     }
