@@ -1,10 +1,14 @@
 package com.farmorai.backend.service;
 
 import com.farmorai.backend.domain.Cart;
+import com.farmorai.backend.dto.CartItemDto;
 import com.farmorai.backend.mapper.CartItemMapper;
 import com.farmorai.backend.mapper.CartMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,4 +40,11 @@ public class CartService {
     }
 
 
+    public List<CartItemDto> getCartItemsByMemberId(Long memberId) {
+        Cart cart = cartMapper.getCartById(memberId);
+        if (cart == null) {
+            return Collections.emptyList(); // 빈 리스트 반환 (null 방지)
+        }
+        return cartItemMapper.getCartItemList(cart.getCartId());
+    }
 }
