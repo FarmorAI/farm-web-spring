@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +32,7 @@ public class FileUploadController {
 
 
     private final FileUploadUtil fileUploadUtil;
-    private static final String FASTAPI_SERVER_URL = "http://localhost:8000/detect";
+    private static final String FASTAPI_SERVER_URL = "http://localhost:9090/analyze";
 
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;
@@ -51,7 +52,7 @@ public class FileUploadController {
                 Path filePath = Paths.get(file.getAbsolutePath());
                 byte[] fileBytes = Files.readAllBytes(filePath);
 
-                // FastAPI에 파일을 멀티파트 폼데이터 형식으로 전송
+                // FastAPI 파일을 멀티파트 폼데이터 형식으로 전송
                 RestTemplate restTemplate = new RestTemplate();
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -72,7 +73,8 @@ public class FileUploadController {
                         byte[].class
                 );
 
-                log.info("FastAPI 요청 결과: {}", response);
+                String responseBody = new String(response.getBody(), StandardCharsets.UTF_8);
+                log.info("FastAPI 요청 결과: {}", responseBody);
 
                 if (response.getStatusCode().is2xxSuccessful()) {
                     log.info("✅ FastAPI로 파일 전송 성공!");
