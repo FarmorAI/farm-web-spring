@@ -18,15 +18,35 @@ public class CartService {
     private final CartMapper cartMapper;
 
     /**
-     * 장바구니에 상품 추가
+     * 장바구니에 상품 추가 또는 수정 (수량 변경)
      */
     public void addCart(Long memberId, Long productId, int quantity) {
-        // 장바구니 조회
         Cart cart = cartMapper.getCartById(memberId);
         cart = ensureCartExists(memberId, cart);
-        // 상품 추가
-        cartItemMapper.insertCartItem(cart.getCartId(),productId,quantity);
+        addOrUpdateItem(productId, quantity, cart);
+    }
 
+    /**
+     * 회원의 장바구니 목록 조회
+     * @param memberId
+     * @return
+     */
+    public List<CartItemDto> getCartItemsByMemberId(Long memberId) {
+        Cart cart = cartMapper.getCartById(memberId);
+        if (cart == null) {
+            return Collections.emptyList(); // 빈 리스트 반환 (null 방지)
+        }
+        return cartItemMapper.getCartItemList(cart.getCartId());
+    }
+
+    private void addOrUpdateItem(Long productId, int quantity, Cart cart) {
+        boolean exists =cartItemMapper.getCartItemExists(cart.getCartId(), productId);
+        if (exists) {
+            // 상품이 이미 있으면 수량만 변경
+            cartItemMapper.updateCartItem(cart.getCartId(), productId, quantity);
+        } else {
+            cartItemMapper.insertCartItem(cart.getCartId(), productId, quantity);
+        }
     }
 
     private Cart ensureCartExists(Long memberId, Cart cart) {
@@ -37,14 +57,5 @@ public class CartService {
         }
         // 장바구니가 있으면 리턴
         return cart;
-    }
-
-
-    public List<CartItemDto> getCartItemsByMemberId(Long memberId) {
-        Cart cart = cartMapper.getCartById(memberId);
-        if (cart == null) {
-            return Collections.emptyList(); // 빈 리스트 반환 (null 방지)
-        }
-        return cartItemMapper.getCartItemList(cart.getCartId());
     }
 }

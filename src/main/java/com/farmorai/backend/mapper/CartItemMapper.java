@@ -21,4 +21,6 @@ public interface CartItemMapper {
     void deleteAllCartItem(Long cartId);
 
 
+    boolean getCartItemExists(Long cartId, Long productId);
+
 }
