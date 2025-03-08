@@ -20,8 +20,8 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> addCart(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId, int quantity) {
-        cartService.addCart(userDetails.getMemberId(), productId, quantity);
+    public ResponseEntity<ApiResponse<String>> addCart(Long memberId, Long productId, int quantity) {
+        cartService.addCart(memberId, productId, quantity);
         return ResponseEntity.ok(new ApiResponse<>(200, "장바구니가 생성되었습니다.", null));
     }
 
