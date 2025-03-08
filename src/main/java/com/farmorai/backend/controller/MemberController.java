@@ -156,12 +156,12 @@ public class MemberController {
 
     //아이디 찾기
     @PostMapping("/auth/find-email")
-    public ResponseEntity<ApiResponse<Map<String,String>>> findId(@RequestBody MemberDto memberDto){
+    public ResponseEntity<ApiResponse<Map<String,Object>>> findId(@RequestBody MemberDto memberDto){
         String email = memberService.findEmail(memberDto.getName(), memberDto.getPhone());
         if(email == null){
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(404,"해당 정보로 등록된 이메일이 없습니다.",null));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(200,"이메일 찾기 성공", Map.of("email", email)));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(200,"이메일 찾기 성공", Map.of("email", email)));
     }
 
 //    //비밀번호 찾기

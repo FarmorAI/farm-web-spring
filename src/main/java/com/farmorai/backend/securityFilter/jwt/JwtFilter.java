@@ -89,7 +89,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
-        CustomUserDetails principal = new CustomUserDetails(memberId,email, "", auth, nickname);
+        CustomUserDetails principal = new CustomUserDetails(memberId,email, "",auth, nickname);
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()

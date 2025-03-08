@@ -9,6 +9,7 @@ import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 
 
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notice")
@@ -36,7 +38,11 @@ public class NoticeController {
 
     @GetMapping("/{noticeId}")
     public NoticeDto getNoticeDetail(@PathVariable Long noticeId) {
-        return noticeService.getNoticeDetail(noticeId);
+        NoticeDto noticeDetail = noticeService.getNoticeDetail(noticeId);
+        if(noticeDetail == null){
+            throw new IllegalArgumentException("해당 공지사항이 존재하지 않습니다.");
+        }
+        return noticeDetail;
     }
 
     @PostMapping
@@ -45,13 +51,13 @@ public class NoticeController {
         if(userDetails == null || !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROLE_ADMIN"))){
             return ResponseEntity.status(FORBIDDEN).body("관리자만 글 등록이 가능합니다.");
         }
+        log.info("noticeDto {}",noticeDto);
         noticeService.insertNotice(userDetails.getMemberId(),noticeDto);
         return ResponseEntity.ok("글 등록 성공");
     }
 
 
     @PutMapping("/{noticeId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public Map<String,String> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeDto noticeDto) {
         noticeService.updateNotice(noticeId, noticeDto);
         return Map.of("result","success");
