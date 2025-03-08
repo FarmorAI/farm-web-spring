@@ -2,6 +2,7 @@ package com.farmorai.backend.service;
 
 import com.farmorai.backend.dto.*;
 import com.farmorai.backend.mapper.InquiryMapper;
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -46,14 +47,9 @@ public class InquiryService {
     }
 
     // 문의 추가
-    public ResponseEntity<String> insertInquiry(InquiryDto inquiryDto) {
-        String email = getCurrentUsername();
-
-        if(email != null) {
-            MemberDto memberDto = memberService.getMemberByEmail(email);
-            inquiryDto.setMemberId(memberDto.getMemberId());
-            inquiryDto.setWriter(memberDto.getNickname());
-        }
+    public ResponseEntity<String> insertInquiry(InquiryDto inquiryDto, CustomUserDetails userDetails) {
+        inquiryDto.setMemberId(userDetails.getMemberId());
+        inquiryDto.setWriter(userDetails.getNickname());
         inquiryMapper.insertInquiry(inquiryDto);
         return ResponseEntity.ok("Success");
     }
