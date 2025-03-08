@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.CartMapper">
+
+    <insert id="insertCart" parameterType="Long">
+        INSERT INTO cart (member_id, created_at)
+        VALUES (#{memberId}, now())
+    </insert>
+
+    <select id="getCartById" parameterType="Long" resultType="com.farmorai.backend.domain.Cart">
+        SELECT cart_id, member_id, created_at
+        FROM cart
+        WHERE member_id = #{memberId}
+    </select>
+
+    <delete id="deleteCart" parameterType="Long">
+        DELETE
+        FROM cart
+        WHERE cart_id = #{cartId}
+    </delete>
+
+</mapper>

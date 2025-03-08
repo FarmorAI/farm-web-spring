@@ -5,6 +5,7 @@ import com.farmorai.backend.dto.NoticeDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
 
+import com.farmorai.backend.dto.response.ApiResponse;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.NoticeService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -72,4 +74,5 @@ public class NoticeController {
         noticeService.deleteNotice(noticeId);
         return ResponseEntity.ok("공지사항이 삭제되었습니다.");
     }
+
 }
