@@ -67,7 +67,7 @@ public class JwtTokenProvider {
 
     // ROLE_ 권한 조회
     public List<SimpleGrantedAuthority> getAuthorities(String role) {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     // JWT 토큰 유효 여부 검증
