@@ -1,5 +1,8 @@
 package com.farmorai.backend.securityFilter.jwt;
 
+import com.farmorai.backend.dto.MemberDto;
+import com.farmorai.backend.dto.response.ApiResponse;
+import com.farmorai.backend.mapper.MemberMapper;
 import com.farmorai.backend.securityFilter.AuthStrategy;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +33,7 @@ import java.util.Map;
 public class JwtAuthStrategy implements AuthStrategy {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final MemberMapper memberMapper;
 
     /**
      * 인증이 성공했을 때, 실행되는 메서드
@@ -52,7 +56,27 @@ public class JwtAuthStrategy implements AuthStrategy {
                 userDetails.getAuthorities().iterator().next().getAuthority(),
                 userDetails.getNickname()
         );
+
+        MemberDto member = memberMapper.getMemberByEmail(userDetails.getUsername());
+
+
         resp.addHeader("Authorization", "Bearer " + token);
+
+        resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        resp.setCharacterEncoding("UTF-8");
+        // :흰색_확인_표시: 응답 데이터 생성
+        // ✅ 응답 바디에 사용자 정보 추가
+        objectMapper.writeValue(resp.getWriter(),
+               new ApiResponse<>(200,"로그인 성공", Map.of(
+                       "token", token,
+                       "user", Map.of(
+                               "email", userDetails.getUsername(),
+                               "nickname", userDetails.getNickname(),
+                               "imageUrl", member.getImageUrl(),
+                               "memberRole", userDetails.getAuthorities().iterator().next().getAuthority()
+                       )
+               ))
+        );
 
     }
 

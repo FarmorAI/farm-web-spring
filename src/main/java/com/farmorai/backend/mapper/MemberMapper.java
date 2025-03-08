@@ -26,4 +26,6 @@ public interface MemberMapper {
     boolean checkEmail(String email);
 
     void updateProfileImage(@Param("memberId") Long memberId, @Param("imageUrl") String imageUrl);
+
+    String findEmail(@Param("name") String name, @Param("phone") String phone);
 }

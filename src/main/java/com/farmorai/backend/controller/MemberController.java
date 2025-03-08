@@ -2,11 +2,13 @@ package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
 
+import com.farmorai.backend.dto.response.ApiResponse;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -99,10 +101,8 @@ public class MemberController {
         if (memberDto == null) {
             return ResponseEntity.notFound().build();
         }
-        memberDto.setName(updateInfo.get("name"));
         memberDto.setNickname(updateInfo.get("nickname"));
         memberDto.setPhone(updateInfo.get("phone"));
-        memberDto.setBirthDate(updateInfo.get("birthDate"));
         memberDto.setAddress(updateInfo.get("address"));
 
         memberService.updateMember(memberDto);
@@ -139,7 +139,7 @@ public class MemberController {
     }
 
     //회원 프로필 이미지 업로드
-    @PatchMapping("/auth/upload-profile")
+    @PutMapping("/auth/upload-profile")
     public ResponseEntity<?> uploadProfileImage(@RequestParam("profileImage") MultipartFile profileImage,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -151,6 +151,19 @@ public class MemberController {
                     .body(Collections.singletonMap("error", "프로필 이미지 업데이트 실패"));
         }
     }
+
+    //아이디 찾기
+    @PostMapping("/auth/find-email")
+    public ResponseEntity<ApiResponse<Map<String,String>>> findEmail(@RequestBody MemberDto memberDto){
+        String email = memberService.findEmail(memberDto.getName(), memberDto.getPhone());
+        if(email == null){
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(404,"해당 정보로 등록된 이메일이 없습니다.",null));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(200,"이메일 찾기 성공", Map.of("email", email)));
+    }
+
+//    //비밀번호 찾기
+//    @PostMapping("/auth/find-password")
 
 
 }
