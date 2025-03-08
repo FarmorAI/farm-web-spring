@@ -40,7 +40,8 @@
     <delete id="deleteCartItem" parameterType="Long">
         DELETE
         FROM cart_item
-        WHERE cart_item_id = #{cartItemId}
+        WHERE cart_id = #{cartId}
+        AND product_id = #{productId}
     </delete>
 
     <!-- 장바구니 상품 전체 제거-->

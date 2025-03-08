@@ -58,4 +58,9 @@ public class CartService {
         // 장바구니가 있으면 리턴
         return cart;
     }
+
+    public void deleteCartItem(Long memberId, Long productId) {
+        Cart cart = cartMapper.getCartById(memberId);
+        cartItemMapper.deleteCartItem(cart.getCartId(),productId);
+    }
 }

@@ -22,16 +22,21 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> addCart(Long memberId, Long productId, int quantity) {
-        cartService.addCart(memberId, productId, quantity);
+    public ResponseEntity<ApiResponse<String>> addCart(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId, int quantity) {
+        cartService.addCart(userDetails.getMemberId(), productId, quantity);
         return ResponseEntity.ok(new ApiResponse<>(200, "장바구니가 생성되었습니다.", null));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CartItemDto>>> getCartItemsByMember(@RequestParam Long memberId) {
-//        Long memberId = userDetails.getMemberId(); // 현재 로그인한 사용자의 memberId 가져오기
-        List<CartItemDto> cartItems = cartService.getCartItemsByMemberId(memberId);
+    public ResponseEntity<ApiResponse<List<CartItemDto>>> getCartItemsByMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<CartItemDto> cartItems = cartService.getCartItemsByMemberId(userDetails.getMemberId());
         return ResponseEntity.ok(new ApiResponse<>(200, "장바구니 목록 조회 성공", cartItems));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<String>> deleteCartItem(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId) {
+        cartService.deleteCartItem(userDetails.getMemberId(), productId);
+        return ResponseEntity.ok(new ApiResponse<>(200, "장바구니 상품 삭제 성공", null));
     }
 
 
