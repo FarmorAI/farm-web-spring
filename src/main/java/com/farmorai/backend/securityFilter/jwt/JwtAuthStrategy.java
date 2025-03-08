@@ -61,21 +61,23 @@ public class JwtAuthStrategy implements AuthStrategy {
 
 
         resp.addHeader("Authorization", "Bearer " + token);
+
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
         resp.setCharacterEncoding("UTF-8");
-
+        // :흰색_확인_표시: 응답 데이터 생성
         // ✅ 응답 바디에 사용자 정보 추가
         objectMapper.writeValue(resp.getWriter(),
-                new ApiResponse<>(200, "로그인 성공", Map.of(
-                        "token", token,
-                        "user", Map.of(
-                                "email", userDetails.getUsername(),
-                                "nickname", userDetails.getNickname(),
-                                "imageUrl", member.getImageUrl(),
-                                "role", userDetails.getAuthorities().iterator().next().getAuthority()
-                        )
-                ))
+               new ApiResponse<>(200,"로그인 성공", Map.of(
+                       "token", token,
+                       "user", Map.of(
+                               "email", userDetails.getUsername(),
+                               "nickname", userDetails.getNickname(),
+                               "imageUrl", member.getImageUrl(),
+                               "memberRole", userDetails.getAuthorities().iterator().next().getAuthority()
+                       )
+               ))
         );
+
     }
 
     /**
