@@ -101,10 +101,8 @@ public class MemberController {
         if (memberDto == null) {
             return ResponseEntity.notFound().build();
         }
-        memberDto.setName(updateInfo.get("name"));
         memberDto.setNickname(updateInfo.get("nickname"));
         memberDto.setPhone(updateInfo.get("phone"));
-        memberDto.setBirthDate(updateInfo.get("birthDate"));
         memberDto.setAddress(updateInfo.get("address"));
 
         memberService.updateMember(memberDto);
@@ -141,7 +139,7 @@ public class MemberController {
     }
 
     //회원 프로필 이미지 업로드
-    @PatchMapping("/auth/upload-profile")
+    @PutMapping("/auth/upload-profile")
     public ResponseEntity<?> uploadProfileImage(@RequestParam("profileImage") MultipartFile profileImage,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -156,7 +154,7 @@ public class MemberController {
 
     //아이디 찾기
     @PostMapping("/auth/find-email")
-    public ResponseEntity<ApiResponse<Map<String,String>>> findId(@RequestBody MemberDto memberDto){
+    public ResponseEntity<ApiResponse<Map<String,String>>> findEmail(@RequestBody MemberDto memberDto){
         String email = memberService.findEmail(memberDto.getName(), memberDto.getPhone());
         if(email == null){
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(404,"해당 정보로 등록된 이메일이 없습니다.",null));
