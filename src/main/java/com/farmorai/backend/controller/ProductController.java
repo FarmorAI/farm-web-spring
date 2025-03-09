@@ -32,7 +32,7 @@ public class ProductController {
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductDto>> getProductById(@PathVariable Long productId) {
         Optional<ProductDto> product = productService.getProductById(productId);
-        return ResponseEntity.ok(new ApiResponse<>(200,"상품 조회 성공", product.orElseThrow()));
+        return ResponseEntity.ok(ApiResponse.success("상품 조회 성공", product.orElseThrow()));
     }
 
     @PostMapping
@@ -42,7 +42,7 @@ public class ProductController {
         log.info("file = {}",file);
         productDto.setImageUrl(s3Service.uploadFile(file));
         productService.registerProduct(productDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(201, "상품 등록 성공", "success"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("상품 등록 성공", "success"));
     }
 
 

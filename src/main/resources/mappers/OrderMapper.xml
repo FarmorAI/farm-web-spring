@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.OrderMapper">
+    <!-- 주문 생성 -->
+    <insert id="insertOrder" parameterType="com.farmorai.backend.domain.Order" useGeneratedKeys="true" keyProperty="ordersId">
+        INSERT INTO orders (member_id, total_amount, shipping_fee, order_number,status, created_at, updated_at)
+        VALUES (#{memberId}, #{totalAmount}, #{shippingFee}, #{orderNumber}, #{status}, NOW(), NOW());
+    </insert>
+
+    <!-- 주문 상세 정보 저장 -->
+    <insert id="insertOrderItems">
+        INSERT INTO order_detail (orders_id, product_id, quantity, price, created_at)
+        VALUES
+        <foreach collection="orderItems" item="orderItem" separator=",">
+            (#{orderItem.ordersId}, #{orderItem.productId}, #{orderItem.quantity}, #{orderItem.price}, NOW())
+        </foreach>
+    </insert>
+
+</mapper>

@@ -67,7 +67,7 @@ public class JwtAuthStrategy implements AuthStrategy {
         // :흰색_확인_표시: 응답 데이터 생성
         // ✅ 응답 바디에 사용자 정보 추가
         objectMapper.writeValue(resp.getWriter(),
-               new ApiResponse<>(200,"로그인 성공", Map.of(
+               ApiResponse.success("로그인 성공", Map.of(
                        "token", token,
                        "user", Map.of(
                                "email", userDetails.getUsername(),

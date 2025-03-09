@@ -157,9 +157,9 @@ public class MemberController {
     public ResponseEntity<ApiResponse<Map<String,String>>> findEmail(@RequestBody MemberDto memberDto){
         String email = memberService.findEmail(memberDto.getName(), memberDto.getPhone());
         if(email == null){
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(404,"해당 정보로 등록된 이메일이 없습니다.",null));
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.success("해당 정보로 등록된 이메일이 없습니다.",null));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(200,"이메일 찾기 성공", Map.of("email", email)));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("이메일 찾기 성공", Map.of("email", email)));
     }
 
 //    //비밀번호 찾기
