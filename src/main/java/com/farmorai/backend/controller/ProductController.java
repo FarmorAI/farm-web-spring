@@ -1,6 +1,7 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.ProductDto;
+import com.farmorai.backend.dto.response.ApiResponse;
 import com.farmorai.backend.service.ProductService;
 import com.farmorai.backend.service.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -29,23 +30,19 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDto> getProductById(@PathVariable Long productId) {
+    public ResponseEntity<ApiResponse<ProductDto>> getProductById(@PathVariable Long productId) {
         Optional<ProductDto> product = productService.getProductById(productId);
-        return ResponseEntity.ok(product.orElseThrow());
+        return ResponseEntity.ok(ApiResponse.success("상품 조회 성공", product.orElseThrow()));
     }
 
-
-
-
-
     @PostMapping
-    public ResponseEntity<String> registerProduct(@RequestPart("product") ProductDto productDto,
+    public ResponseEntity<ApiResponse<String>> registerProduct(@RequestPart("product") ProductDto productDto,
                                                   @RequestPart("file") MultipartFile file) {
         log.info("productDto = {}",productDto);
         log.info("file = {}",file);
         productDto.setImageUrl(s3Service.uploadFile(file));
         productService.registerProduct(productDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("상품 등록 성공", "success"));
     }
 
 

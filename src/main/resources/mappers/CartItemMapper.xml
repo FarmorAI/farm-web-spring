@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.CartItemMapper">
+
+
+    <select id="getCartItemList" parameterType="Long" resultType="com.farmorai.backend.dto.CartItemDto">
+        SELECT ci.cart_item_id,
+               ci.cart_id,
+               ci.created_at,
+               ci.product_id,
+               ci.quantity,
+               p.name as pname,
+               p.price,
+               p.image_url
+        FROM cart_item ci
+                 INNER JOIN product p ON ci.product_id = p.product_id
+        WHERE ci.cart_id = #{cartId}
+    </select>
+
+    <select id="getCartItemExists" parameterType="map" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM cart_item WHERE cart_id = #{cartId} AND product_id = #{productId}
+        )
+    </select>
+
+    <update id="updateCartItem" parameterType="com.farmorai.backend.dto.CartItemDto">
+        UPDATE cart_item
+        SET quantity = quantity+#{quantity}
+        WHERE cart_id = #{cartId}
+          AND product_id = #{productId}
+    </update>
+
+    <insert id="insertCartItem" parameterType="com.farmorai.backend.dto.CartItemDto">
+        INSERT INTO cart_item (cart_id, product_id, quantity, created_at)
+        VALUES (#{cartId}, #{productId}, #{quantity}, now())
+    </insert>
+    <!-- 장바구니 상품 1개 제거-->
+    <delete id="deleteCartItem" parameterType="Long">
+        DELETE
+        FROM cart_item
+        WHERE cart_id = #{cartId}
+        AND product_id = #{productId}
+    </delete>
+
+    <!-- 장바구니 상품 전체 제거-->
+    <delete id="deleteAllCartItem" parameterType="Long">
+        DELETE
+        FROM cart_item
+        WHERE cart_id = #{cartId}
+    </delete>
+
+</mapper>

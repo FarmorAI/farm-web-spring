@@ -51,6 +51,4 @@ public class NoticeService {
     public void updateNotice(Long noticeId, NoticeDto noticeDto) {
         noticeMapper.updateNotice(noticeId, noticeDto);
     }
-
-
 }
