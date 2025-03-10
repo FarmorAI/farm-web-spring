@@ -4,6 +4,8 @@ import com.farmorai.backend.dto.NaverPayInfoDto;
 import com.farmorai.backend.dto.PaymentDto;
 import com.farmorai.backend.dto.SubsDto;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
+import com.farmorai.backend.service.CartService;
+import com.farmorai.backend.service.OrderService;
 import com.farmorai.backend.service.PaymentService;
 import com.farmorai.backend.service.SubsService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,12 +35,16 @@ public class PaymentController {
     private WebClient webClient;
     private final PaymentService paymentService;
     private final SubsService subsService;
+    private OrderService orderService;
+    private CartService cartService;
 
     @Autowired
-    public PaymentController(WebClient.Builder webClientBuilder, PaymentService paymentService, SubsService subsService) {
+    public PaymentController(WebClient.Builder webClientBuilder, PaymentService paymentService, SubsService subsService, OrderService orderService, CartService cartService) {
         this.webClient = webClientBuilder.baseUrl("https://dev-pub.apis.naver.com").build();
         this.paymentService = paymentService;
         this.subsService = subsService;
+        this.orderService = orderService;
+        this.cartService = cartService;
     }
 
     @Value("${naver.pay.client-id}")
@@ -98,6 +104,7 @@ public class PaymentController {
     public Mono<ResponseEntity<?>> naverPayCartReserve(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody Map<String, Object> request) {
         log.info("Request received: {}", request);
         List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
+        String orderNumber = (String) request.get("orderNumber");
 
         if (items == null || items.isEmpty()) {
             return Mono.fromSupplier(() -> ResponseEntity.badRequest().body("No cart items provided"));
@@ -121,7 +128,7 @@ public class PaymentController {
                 .totalPayAmount(totalAmount)
                 .taxScopeAmount(totalAmount)
                 .taxExScopeAmount(0)
-                .returnUrl(String.format("http://localhost:6060/api/payment/result?subsPlan=Cart&subsPrice=%d&epd=%s", totalAmount, encodedPid))
+                .returnUrl(String.format("http://localhost:6060/api/payment/result?orderNumber=%s&subsPlan=Cart&subsPrice=%d&epd=%s", orderNumber,totalAmount, encodedPid))
                 .build();
 
         return webClient.post()
@@ -146,6 +153,7 @@ public class PaymentController {
             @RequestParam String subsPlan,
             @RequestParam String subsPrice,
             @RequestParam(required = false) String epd,
+            @RequestParam(required = false) String orderNumber,
             HttpServletResponse resp
     ) throws IOException {
         // encodedPid decoding
@@ -161,12 +169,14 @@ public class PaymentController {
         String encodedSubsPlan = URLEncoder.encode(subsPlan, StandardCharsets.UTF_8);
         String redirectUrl;
         if("Cart".equals(subsPlan)) {
-            redirectUrl = "http://localhost:3030/cart/payment/result?";
+//            cartService.deleteCartItem(subsDto.getMemberId(), );
+            orderService.updateOrderStatus(orderNumber,paymentId);
+            redirectUrl = "http://localhost:3030/cart/payment/result?orderNumber=" + orderNumber+"&";
         }
         else {
             redirectUrl = "http://localhost:3030/payment/result?";
         }
-        String params = "&resultCode=" + resultCode + "&paymentId=" + paymentId + "&subsPlan=" + encodedSubsPlan + "&subsPrice=" + subsPrice;
+        String params = "resultCode=" + resultCode + "&paymentId=" + paymentId + "&subsPlan=" + encodedSubsPlan + "&subsPrice=" + subsPrice;
 
         if ("Success".equals(resultCode)) {
             resp.sendRedirect(redirectUrl + params);

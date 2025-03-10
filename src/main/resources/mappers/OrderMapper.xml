@@ -4,8 +4,9 @@
 
 <mapper namespace="com.farmorai.backend.mapper.OrderMapper">
     <!-- 주문 생성 -->
-    <insert id="insertOrder" parameterType="com.farmorai.backend.domain.Order" useGeneratedKeys="true" keyProperty="ordersId">
-        INSERT INTO orders (member_id, total_amount, shipping_fee, order_number,status, created_at, updated_at)
+    <insert id="insertOrder" parameterType="com.farmorai.backend.domain.Order" useGeneratedKeys="true"
+            keyProperty="ordersId">
+        INSERT INTO orders (member_id, total_amount, shipping_fee, order_number, status, created_at, updated_at)
         VALUES (#{memberId}, #{totalAmount}, #{shippingFee}, #{orderNumber}, #{status}, NOW(), NOW());
     </insert>
 
@@ -18,4 +19,41 @@
         </foreach>
     </insert>
 
+    <!-- 주문 상태 업데이트 (결제 완료)   -->
+    <update id="updateOrderStatus" parameterType="com.farmorai.backend.domain.Order">
+        UPDATE orders
+        SET payment_token = #{paymentId} ,status = #{status}, updated_at = NOW()
+        WHERE order_number = #{orderNumber}
+    </update>
+
+    <!-- 주문 조회  -->
+    <select id="getOrderByNumber" resultType="com.farmorai.backend.dto.OrderItemDto">
+        select od.order_detail_id, od.orders_id, od.product_id, od.price , od.quantity, od.price * quantity as amount, p.name as pname, p.image_url as imageUrl
+        from order_detail od inner join product p on od.product_id = p.product_id
+        where orders_id = (select orders_id
+                           from orders
+                           where order_number = #{orderNumber})
+    </select>
+
+    <!-- (회원) 주문 조회  -->
+    <select id="getOrderByMember" parameterType="Long" resultType="com.farmorai.backend.dto.OrderItemDto">
+        select od.order_detail_id,
+               od.price,
+               od.quantity,
+               p.product_id,
+               p.name         as pname,
+               p.image_url    as imageUrl,
+               o.orders_id,
+               o.order_number as orderNumber,
+               o.total_amount as totalAmount,
+               o.created_at as createdAt,
+               o.status as status
+        from order_detail od
+                 inner join product p on od.product_id = p.product_id
+                 inner join orders o on od.orders_id = o.orders_id
+        where od.orders_id IN (select orders_id
+                              from orders
+                              where member_id = #{memberId})
+        ORDER BY od.orders_id DESC
+    </select>
 </mapper>
