@@ -21,7 +21,7 @@ public class AnalysisController {
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(FASTAPI_URL, String.class);
 
-        // ✅ Jackson의 ObjectMapper 사용 (별도 라이브러리 설치 불필요)
+        // ✅ Jackson의 ObjectMapper 사용
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(response);
         JsonNode distributions = rootNode.get("distribution");
@@ -33,8 +33,17 @@ public class AnalysisController {
             dataMap.put("grade", gradeData.get("grade").asInt());
             dataMap.put("mu", gradeData.get("mu").asDouble());
             dataMap.put("std", gradeData.get("std").asDouble());
+            dataMap.put("mean", gradeData.get("mean").asDouble());
             dataMap.put("x", objectMapper.convertValue(gradeData.get("x"), List.class));
             dataMap.put("y", objectMapper.convertValue(gradeData.get("y"), List.class));
+
+            // ✅ FastAPI에서 받아온 `threshold_75` 추가
+            if (gradeData.has("threshold_75")) {
+                dataMap.put("threshold_75", gradeData.get("threshold_75").asDouble());
+            } else {
+                System.out.println("⚠️ threshold_75 값이 FastAPI 응답에 없음!"); // 디버깅 로그
+            }
+
             result.add(dataMap);
         }
 
