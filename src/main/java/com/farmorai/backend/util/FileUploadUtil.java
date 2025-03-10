@@ -2,7 +2,7 @@ package com.farmorai.backend.util;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileUrlResource;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class FileUploadUtil {
 
@@ -123,13 +123,5 @@ public class FileUploadUtil {
                 throw new RuntimeException(e.getMessage());
             }
         });
-
-
-
     }
-
-
-
-
-
 }
