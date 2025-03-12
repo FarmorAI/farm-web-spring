@@ -2,6 +2,7 @@ package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.NaverPayInfoDto;
 import com.farmorai.backend.dto.PaymentDto;
+import com.farmorai.backend.dto.PaymentSubsDto;
 import com.farmorai.backend.dto.SubsDto;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.CartService;
@@ -55,6 +56,17 @@ public class PaymentController {
 
     @Value("${naver.pay.chain-id}")
     private String naverPayChainId;
+
+
+    // 구독 결제 정보 조회
+    @GetMapping("/subsInfo")
+    public ResponseEntity<PaymentSubsDto> subscriptions(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        PaymentSubsDto paymentSubsInfo = paymentService.getPaymentInfo(userDetails.getMemberId());
+        return ResponseEntity.ok().body(paymentSubsInfo);
+    };
+
 
     // 기존 단일 상품 결제
     @PostMapping("/naverpay")

@@ -4,10 +4,12 @@ import com.farmorai.backend.dto.*;
 import com.farmorai.backend.mapper.MemberMapper;
 import com.farmorai.backend.mapper.PaymentMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -48,5 +50,10 @@ public class PaymentService {
     // Payment Update
     public void refundPayment(String token) {
         paymentMapper.refundPayment(token);
+    }
+
+    // 구독 정보 가져오기
+    public PaymentSubsDto getPaymentInfo(Long memberId) {
+        return paymentMapper.getPaymentInfo(memberId);
     }
 }
