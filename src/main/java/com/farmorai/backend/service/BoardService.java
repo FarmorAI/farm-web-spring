@@ -37,8 +37,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void insertBoard(BoardDto boardDto) {
-        boardMapper.insertBoard(boardDto);
+    public void insertBoard(Long memberId, BoardDto boardDto) {
+        boardMapper.insertBoard(memberId,boardDto);
     }
     @Transactional
     public void updateBoard(Long boardId, BoardDto boardDto) {

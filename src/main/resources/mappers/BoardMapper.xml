@@ -15,7 +15,7 @@
                 AND content LIKE CONCAT('%', #{content}, '%')
             </if>
         </where>
-        ORDER BY created_at DESC
+        ORDER BY board_id DESC
             LIMIT #{size} OFFSET #{offset}
     </select>
 
@@ -37,7 +37,7 @@
     </select>
 
     <insert id = "insertBoard" parameterType="com.farmorai.backend.dto.BoardDto">
-        INSERT INTO board (title, content, created_at, updated_at) VALUES (#{title}, #{content}, now(), now())
+        INSERT INTO board (title, content, member_id, created_at, updated_at) VALUES (#{board.title}, #{board.content}, #{memberId},now(), now())
     </insert>
 
     <delete id = "deleteBoard" parameterType="Long">

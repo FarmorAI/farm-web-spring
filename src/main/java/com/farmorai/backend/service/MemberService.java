@@ -189,6 +189,11 @@ public class MemberService {
         if (memberMapper.checkEmail(email)) {
             MemberDto memberDto = memberMapper.getMemberByEmail(email);
             log.info("memberDto = {}", memberDto);
+            // 이미 회원인데 social 값이 false일 경우 social 값을 true로 설정
+            if (!memberDto.isSocial()) {
+                memberDto.setSocial(true);  // social 값을 true로 변경
+                memberMapper.updateMember(memberDto);  // 변경된 값 업데이트
+            }
             return memberDto;
         }
 
@@ -218,7 +223,6 @@ public class MemberService {
 
         log.info("Naver response: {}", naverResult);
 
-        // 네이버 API 응답 형식: { "resultcode": "00", "message": "success", "response": { ... } }
         LinkedHashMap<String, Object> profile = (LinkedHashMap<String, Object>) naverResult.get("response");
 
         return profile;

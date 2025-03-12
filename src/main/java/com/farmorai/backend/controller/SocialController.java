@@ -127,31 +127,51 @@ public class SocialController {
 
     // 소셜 로그인 네이버
     @PostMapping("/api/member/social/naver")
-    public Map<String, Object> getMemberFromNaver(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+    public ResponseEntity<Map<String, Object>> getMemberFromNaver(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         log.info("authorizationHeader =========================== {} ", authorizationHeader);
-        if (authorizationHeader == null) {
-            return Map.of("result", "fail");
-        }
-        // Bearer 접두사 제거
-        if (!authorizationHeader.startsWith("Bearer ")) {
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             log.error("Authorization 헤더가 올바르지 않습니다 {}", authorizationHeader);
-            return Map.of("result", "fail");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("result", "fail"));
         }
 
+        // Bearer 접두사 제거 후 네이버 Access Token 추출
         String accessToken = authorizationHeader.replace("Bearer ", "").trim();
-        log.info(accessToken); // JWT가 아니라 네이버 AccessToken임
-        Map<String, Object> naverMap = new HashMap<>();
+        log.info("네이버 Access Token: {}", accessToken);
+
+        // 네이버 사용자 정보 가져오기
         MemberDto memberDto = memberService.getNaverMember(accessToken);
+
+        // ✅ 응답 바디에 포함할 사용자 정보 Map 생성
+        Map<String, Object> naverMap = new HashMap<>();
         naverMap.put("member_id", memberDto.getMemberId());
         naverMap.put("email", memberDto.getEmail());
         naverMap.put("nickname", memberDto.getNickname());
         naverMap.put("role", memberDto.getMemberRole().name());
         naverMap.put("social", memberDto.isSocial());
-        naverMap.put("accessToken", jwtTokenProvider.createJwtToken(memberDto.getMemberId(),memberDto.getEmail(), memberDto.getMemberRole().name(), memberDto.getNickname()));
-        log.info("memberDto {} ", memberDto);
 
-        return naverMap;
+        log.info("네이버 회원 정보: {}", memberDto);
+
+        // 🔹 JWT 토큰 생성 및 응답 헤더에 추가
+        String jwtToken = jwtTokenProvider.createJwtToken(
+                memberDto.getMemberId(),
+                memberDto.getEmail(),
+                memberDto.getMemberRole().name(),
+                memberDto.getNickname()
+        );
+        // ✅ JWT 토큰을 응답 바디에도 추가
+        naverMap.put("accessToken", jwtToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + jwtToken);
+
+        // ✅ ResponseEntity로 헤더 + 바디 함께 반환
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(naverMap);
     }
+
 
     @GetMapping("/api/member/social/naver/token")
     public ResponseEntity<?> getNaverToken(@RequestParam("code") String code) {
