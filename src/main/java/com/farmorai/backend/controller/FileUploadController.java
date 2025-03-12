@@ -1,7 +1,6 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.service.FileUploadService;
-import com.farmorai.backend.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.util.HashMap;
@@ -20,7 +20,6 @@ import java.util.Map;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class FileUploadController {
-    private final FileUploadUtil fileUploadUtil;
     private final FileUploadService fileUploadService;
 
     @Value("${com.farmorai.upload.path}")
@@ -40,14 +39,15 @@ public class FileUploadController {
 
             // 첫번째 파일만 처리 (필요에 따라 모든 파일 처리로 확장 가능)
             MultipartFile file = files.get(0);
-            Map<String, Object> processingResult = fileUploadService.sendImageToFastApi(file);
+            Mono<Map<String, Object>> resultMono = fileUploadService.sendImageToFastApi(file);
+            Map<String, Object> result = resultMono.block();
 
-            if (processingResult == null || !processingResult.containsKey("image_url")) {
+            if (result == null || !result.containsKey("image_url")) {
                 log.error("FastAPI 응답에 image_url이 없음");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(createErrorResponse("API 요청 오류"));
             }
-            return ResponseEntity.ok(processingResult);
+            return ResponseEntity.ok(result);
 
         } catch (Exception e) {
             log.error("파일 업로드 처리 실패", e);
@@ -90,7 +90,6 @@ public class FileUploadController {
     public ResponseEntity<Resource> getFile(@PathVariable String fileName) {
         return null;
     }
-
 
     /**
      * File Delete API

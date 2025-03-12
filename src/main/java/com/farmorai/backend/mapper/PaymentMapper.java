@@ -1,6 +1,8 @@
 package com.farmorai.backend.mapper;
 
 import com.farmorai.backend.dto.PaymentDto;
+import com.farmorai.backend.dto.PaymentSubsDto;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -17,4 +19,6 @@ public interface PaymentMapper {
     void updatePayment(PaymentDto paymentDto);
 
     void refundPayment(String token);
+
+    PaymentSubsDto getPaymentInfo(Long memberId);
 }
