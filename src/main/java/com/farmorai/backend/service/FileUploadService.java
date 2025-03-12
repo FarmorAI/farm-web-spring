@@ -27,17 +27,17 @@ public class FileUploadService {
     /**
      * 이미지 파일을 FastAPI 서버로 전송하고 응답을 받습니다.
      * @param file 전송할 이미지 파일
-     * @return FastAPI 서버로부터 받은 응답 데이터
+     * @return FastAPI 서버로부터 받은 응답 데이터를 Mono 형태로 반환
      */
-    public Map<String, Object> sendImageToFastApi(MultipartFile file) {
+    public Mono<Map<String, Object>> sendImageToFastApi(MultipartFile file) {
         // Multipart 요청 생성
         Mono<Map<String, Object>> responseMono = webClient.post()
                 .uri("/analyze")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData("file", file.getResource()))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {});
+                .bodyToMono(new ParameterizedTypeReference<>() {});
 
-        return responseMono.block();
+        return responseMono;
     }
 }

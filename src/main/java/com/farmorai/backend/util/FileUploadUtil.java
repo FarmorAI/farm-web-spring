@@ -38,9 +38,7 @@ public class FileUploadUtil {
         }
 
         String uploadPath = tempFolder.getAbsolutePath();// uploadPath에 해당하는 폴더의 절대경로를 반환
-
         log.info("uploadPath : {} " , uploadPath);
-
     }
 
 

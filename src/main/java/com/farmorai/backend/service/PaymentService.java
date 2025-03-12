@@ -12,17 +12,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentMapper paymentMapper;
-    private final MemberMapper memberMapper;
 
     // PaymentDto 조회
     public PaymentDto getPaymentById(Long paymentId) {
-        PaymentDto paymentDto = paymentMapper.getPaymentById(paymentId);
-        return paymentDto;
+        return paymentMapper.getPaymentById(paymentId);
     }
 
     // PENDING : PaymentDto 생성 및 레코드 저장
-    public PaymentDto insertPayment(String email, String subsPlan, String subsPrice) {
-        MemberDto memberDto = memberMapper.getMemberByEmail(email);
+    public PaymentDto insertPayment(Long memberId, String subsPlan, String subsPrice) {
         Long planId = (long) PaymentPlan.valueOf(subsPlan).ordinal();
 
         PaymentDto paymentDto = new PaymentDto(
@@ -33,15 +30,14 @@ public class PaymentService {
                 PaymentMethod.NAVERPAY,
                 PaymentStatus.PENDING,
                 planId,
-                memberDto.getMemberId(),
+                memberId,
                 null
         );
-
         paymentMapper.insertPayment(paymentDto);
         return paymentDto;
     }
 
-    // Payment 레코드 저장 (Completed)
+    // COMPLETED : Payment 레코드 저장
     public void updatePayment(PaymentDto paymentDto, String paymentId, Long subsId) {
         paymentDto.setToken(paymentId);
         paymentDto.setStatus(PaymentStatus.COMPLETED);

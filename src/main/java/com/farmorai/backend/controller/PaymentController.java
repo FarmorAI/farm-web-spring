@@ -58,7 +58,11 @@ public class PaymentController {
 
     // 기존 단일 상품 결제
     @PostMapping("/naverpay")
-    public Mono<ResponseEntity<?>> naverPayReserve(@RequestBody Map<String, String> reqBody) {
+    public Mono<ResponseEntity<?>> naverPayReserve(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody Map<String, String> reqBody
+    ) {
+        log.debug(userDetails.toString());
         String subsPlan = reqBody.get("subsPlan");
         String subsPrice = reqBody.get("subsPrice");
 
@@ -68,7 +72,7 @@ public class PaymentController {
         }
 
         // PaymentDto 생성 및 레코드 DB 저장
-        PaymentDto paymentDto = paymentService.insertPayment("admin1@example.com", subsPlan, subsPrice);
+        PaymentDto paymentDto = paymentService.insertPayment(userDetails.getMemberId(), subsPlan, subsPrice);
         String pid = "pid" + paymentDto.getPaymentId();
         String encodedPid = Base64.getEncoder().encodeToString(pid.getBytes(StandardCharsets.UTF_8));
 
@@ -101,7 +105,10 @@ public class PaymentController {
 
     // 장바구니 결제 추가
     @PostMapping("/naverpay/cart")
-    public Mono<ResponseEntity<?>> naverPayCartReserve(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody Map<String, Object> request) {
+    public Mono<ResponseEntity<?>> naverPayCartReserve(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody Map<String, Object> request
+    ) {
         log.info("Request received: {}", request);
         List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
         String orderNumber = (String) request.get("orderNumber");
@@ -116,7 +123,7 @@ public class PaymentController {
                 .sum();
 
         // PaymentDto 생성 (장바구니는 subsPlan 대신 "Cart"로 고정)
-        PaymentDto paymentDto = paymentService.insertPayment(userDetails.getUsername(), "Cart", String.valueOf(totalAmount));
+        PaymentDto paymentDto = paymentService.insertPayment(userDetails.getMemberId(), "Cart", String.valueOf(totalAmount));
         String pid = "pid" + paymentDto.getPaymentId();
         String encodedPid = Base64.getEncoder().encodeToString(pid.getBytes(StandardCharsets.UTF_8));
 
@@ -169,7 +176,7 @@ public class PaymentController {
         String encodedSubsPlan = URLEncoder.encode(subsPlan, StandardCharsets.UTF_8);
         String redirectUrl;
         if("Cart".equals(subsPlan)) {
-//            cartService.deleteCartItem(subsDto.getMemberId(), );
+        // cartService.deleteCartItem(subsDto.getMemberId(), );
             orderService.updateOrderStatus(orderNumber,paymentId);
             redirectUrl = "http://localhost:3030/cart/payment/result?orderNumber=" + orderNumber+"&";
         }
