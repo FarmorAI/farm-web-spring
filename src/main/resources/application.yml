@@ -1,6 +1,10 @@
 server:
   port: 6060
 
+logging:
+  level:
+    com.farmorai.backend.mapper: debug
+
 spring:
   output:
     ansi:

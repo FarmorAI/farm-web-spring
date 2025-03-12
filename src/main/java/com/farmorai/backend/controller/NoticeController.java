@@ -5,19 +5,16 @@ import com.farmorai.backend.dto.NoticeDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
 
-import com.farmorai.backend.dto.response.ApiResponse;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 

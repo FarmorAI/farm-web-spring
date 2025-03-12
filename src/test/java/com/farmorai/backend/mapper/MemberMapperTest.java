@@ -36,6 +36,7 @@ class MemberMapperTest {
                 "address",
                 null,
                 null,
+                null,
                 false
         );
     }

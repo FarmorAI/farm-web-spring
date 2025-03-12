@@ -2,20 +2,18 @@ package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.MemberDto;
 
-import com.farmorai.backend.dto.response.ApiResponse;
+import com.farmorai.backend.global.response.ResponseApi;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.securityFilter.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.farmorai.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -154,12 +152,12 @@ public class MemberController {
 
     //아이디 찾기
     @PostMapping("/auth/find-email")
-    public ResponseEntity<ApiResponse<Map<String,String>>> findEmail(@RequestBody MemberDto memberDto){
+    public ResponseEntity<ResponseApi<Map<String,String>>> findEmail(@RequestBody MemberDto memberDto){
         String email = memberService.findEmail(memberDto.getName(), memberDto.getPhone());
         if(email == null){
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.success("해당 정보로 등록된 이메일이 없습니다.",null));
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseApi.success("해당 정보로 등록된 이메일이 없습니다.",null));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("이메일 찾기 성공", Map.of("email", email)));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseApi.success("이메일 찾기 성공", Map.of("email", email)));
     }
 
 //    //비밀번호 찾기

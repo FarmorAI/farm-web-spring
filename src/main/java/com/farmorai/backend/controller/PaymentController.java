@@ -104,6 +104,7 @@ public class PaymentController {
     public Mono<ResponseEntity<?>> naverPayCartReserve(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody Map<String, Object> request) {
         log.info("Request received: {}", request);
         List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
+        log.info("Items received: {}", items);
         String orderNumber = (String) request.get("orderNumber");
 
         if (items == null || items.isEmpty()) {
