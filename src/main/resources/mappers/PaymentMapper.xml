@@ -4,20 +4,30 @@
 
 <mapper namespace="com.farmorai.backend.mapper.PaymentMapper">
     <select id="getAllPayment" resultType="com.farmorai.backend.dto.PaymentDto">
-        SELECT * FROM Payment
+        SELECT * FROM payment
     </select>
 
     <select id="getPaymentById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.PaymentDto">
-        SELECT * FROM Payment WHERE payment_id = #{paymentId}
+        SELECT * FROM payment WHERE payment_id = #{paymentId}
+    </select>
+
+    <select id="getPaymentInfo" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.PaymentSubsDto">
+        SELECT p.payment_id, p.amount, p.token, p.created_at, p.payment_method, s.status, pl.name, DATEDIFF(s.end_date, CURDATE()) AS daysDiff
+        FROM payment p
+        LEFT JOIN subscription s ON p.subs_id = s.subs_id
+        LEFT JOIN plan pl ON pl.plan_id = p.plan_id
+        WHERE s.status = 'ACTIVE' AND p.member_id = #{memberId}
+        ORDER BY p.payment_id DESC
+        LIMIT 1
     </select>
 
     <insert id="insertPayment" parameterType="com.farmorai.backend.dto.PaymentDto" useGeneratedKeys="true" keyProperty="paymentId">
-        INSERT INTO Payment (amount, token, payment_method, status, plan_id, member_id, subs_id)
+        INSERT INTO payment (amount, token, payment_method, status, plan_id, member_id, subs_id)
             VALUES (#{amount}, #{token}, #{paymentMethod}, #{status}, #{planId}, #{memberId}, #{subsId})
     </insert>
 
     <update id="updatePayment" parameterType="Map">
-        UPDATE Payment SET
+        UPDATE payment SET
             token = #{token},
             status = #{status},
             subs_id = #{subsId}
