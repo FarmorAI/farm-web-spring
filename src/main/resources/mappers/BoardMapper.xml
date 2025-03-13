@@ -5,7 +5,9 @@
 <mapper namespace="com.farmorai.backend.mapper.BoardMapper">
     <!-- 페이징 처리된 게시글 리스트 조회 -->
     <select id="getBoardList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.BoardDto">
-        SELECT * FROM board
+        SELECT b.board_id, b.title, m.nickname writer, b.content, b.views, b.created_at, b.updated_at
+        FROM board b
+        inner join member m on b.member_id = m.member_id
         <where>
             1=1
             <if test="title != null and title != ''">
@@ -15,7 +17,7 @@
                 AND content LIKE CONCAT('%', #{content}, '%')
             </if>
         </where>
-        ORDER BY created_at DESC
+        ORDER BY board_id DESC
             LIMIT #{size} OFFSET #{offset}
     </select>
 
@@ -33,11 +35,14 @@
     </select>
 
     <select id = "getBoardDetail" parameterType="Long" resultType="com.farmorai.backend.dto.BoardDto">
-        SELECT board_id, title, content, views, created_at, updated_at FROM board WHERE board_id = #{boardId}
+        SELECT b.board_id, b.title, m.nickname writer, b.content, b.views, b.created_at, b.updated_at
+        FROM board b
+        inner join member m on b.member_id = m.member_id
+        WHERE board_id = #{boardId}
     </select>
 
     <insert id = "insertBoard" parameterType="com.farmorai.backend.dto.BoardDto">
-        INSERT INTO board (title, content, created_at, updated_at) VALUES (#{title}, #{content}, now(), now())
+        INSERT INTO board (title, content, member_id, created_at, updated_at) VALUES (#{board.title}, #{board.content}, #{memberId},now(), now())
     </insert>
 
     <delete id = "deleteBoard" parameterType="Long">

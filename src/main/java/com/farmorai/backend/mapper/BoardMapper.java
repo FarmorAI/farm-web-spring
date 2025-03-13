@@ -14,7 +14,7 @@ public interface BoardMapper {
 
     void deleteBoard(Long boardId);
 
-    void insertBoard(BoardDto boardDto);
+    void insertBoard(@Param("memberId") Long memberId, @Param("board") BoardDto boardDto);
 
     void updateBoard(@Param("boardId") Long boardId, @Param("board") BoardDto boardDto);
 

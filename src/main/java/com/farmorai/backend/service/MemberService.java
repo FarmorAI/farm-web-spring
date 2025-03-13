@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -179,23 +180,34 @@ public class MemberService {
     }
 
     // =======================네이버 소셜 로그인==============================
-    public MemberDto getNaverMember(String accessToken) {
+    public Map<String, Object> getNaverMember(String accessToken) {
         // 네이버 API를 호출하여 사용자 프로필 정보 가져오기
         LinkedHashMap<String, Object> profile = getNaverUserProfile(accessToken);
         String email = (String) profile.get("email");
         String nickname = (String) profile.get("nickname");
 
+        Map<String, Object> result = new HashMap<>();
+
         // 기존에 DB에 회원 정보가 있는 경우 (이메일을 기준으로 체크)
         if (memberMapper.checkEmail(email)) {
             MemberDto memberDto = memberMapper.getMemberByEmail(email);
             log.info("memberDto = {}", memberDto);
-            return memberDto;
+            // 이미 회원인데 social 값이 false일 경우 social 값을 true로 설정
+            if (!memberDto.isSocial()) {
+                memberDto.setSocial(true);  // social 값을 true로 변경
+                memberMapper.updateMember(memberDto);  // 변경된 값 업데이트
+            }
+            result.put("isNewUser", false);  // 기존 사용자일 경우
+            result.put("member", memberDto);
+            return result;
         }
 
         // DB에 회원 정보가 없는 경우 신규 회원 등록
         MemberDto socialMember = makeSocialMemberForNaver(email, nickname);
         memberMapper.insertMember(socialMember);
-        return socialMember;
+        result.put("isNewUser", true);  // 신규 사용자일 경우
+        result.put("member", socialMember);
+        return result;
     }
 
     // 네이버 API를 호출하여 사용자 프로필 정보 추출 (response 에는 email, nickname 등 포함)
@@ -218,7 +230,6 @@ public class MemberService {
 
         log.info("Naver response: {}", naverResult);
 
-        // 네이버 API 응답 형식: { "resultcode": "00", "message": "success", "response": { ... } }
         LinkedHashMap<String, Object> profile = (LinkedHashMap<String, Object>) naverResult.get("response");
 
         return profile;

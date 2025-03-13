@@ -7,6 +7,7 @@ public class BoardDto {
     private Long boardId;
     private String title;
     private String content;
+    private String writer;
     private int views;
     private String createdAt;
     private String updatedAt;
