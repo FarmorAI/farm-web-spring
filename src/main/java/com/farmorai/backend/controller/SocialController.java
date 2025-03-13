@@ -141,32 +141,35 @@ public class SocialController {
         log.info("네이버 Access Token: {}", accessToken);
 
         // 네이버 사용자 정보 가져오기
-        MemberDto memberDto = memberService.getNaverMember(accessToken);
+        Map<String, Object> responseMap = memberService.getNaverMember(accessToken);
 
-        // ✅ 응답 바디에 포함할 사용자 정보 Map 생성
+        MemberDto memberDto = (MemberDto) responseMap.get("member"); // MemberDto 객체를 가져옴
+
+        // 응답 바디에 포함할 사용자 정보 Map 생성
         Map<String, Object> naverMap = new HashMap<>();
         naverMap.put("member_id", memberDto.getMemberId());
         naverMap.put("email", memberDto.getEmail());
         naverMap.put("nickname", memberDto.getNickname());
         naverMap.put("role", memberDto.getMemberRole().name());
         naverMap.put("social", memberDto.isSocial());
+        naverMap.put("isNewUser", responseMap.get("isNewUser"));  // 신규 사용자 여부 추가
 
         log.info("네이버 회원 정보: {}", memberDto);
 
-        // 🔹 JWT 토큰 생성 및 응답 헤더에 추가
+        // JWT 토큰 생성 및 응답 헤더에 추가
         String jwtToken = jwtTokenProvider.createJwtToken(
                 memberDto.getMemberId(),
                 memberDto.getEmail(),
                 memberDto.getMemberRole().name(),
                 memberDto.getNickname()
         );
-        // ✅ JWT 토큰을 응답 바디에도 추가
+        // JWT 토큰을 응답 바디에도 추가
         naverMap.put("accessToken", jwtToken);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + jwtToken);
 
-        // ✅ ResponseEntity로 헤더 + 바디 함께 반환
+        // ResponseEntity로 헤더 + 바디 함께 반환
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(naverMap);
