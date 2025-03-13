@@ -41,9 +41,7 @@ public class CommentService {
             commentDto.setDepth(maxDepth + 1);
             // 부모댓글의 level 값에 +1로 설정
             commentDto.setLevel(parent.getLevel() + 1);
-
             commentDto.setRef(parent.getRef());
-
             commentMapper.insertComment(commentDto);
         }
     }

@@ -6,9 +6,11 @@
 
     <!-- 댓글 목록 조회 (대댓글 포함, 정렬 적용) -->
     <select id="getCommentList" parameterType="Long" resultType="com.farmorai.backend.dto.CommentDto">
-        SELECT * FROM comment
-        WHERE board_id = #{boardId}
-        ORDER BY ref ASC, level ASC
+        SELECT c.*, m.nickname AS writer
+        FROM comment c
+                 LEFT JOIN member m ON c.member_id = m.member_id
+        WHERE c.board_id = #{boardId}
+        ORDER BY c.parent_id ASC, c.depth DESC
     </select>
 
     <!-- 특정 댓글 조회 -->
@@ -41,14 +43,17 @@
 
     <!-- 댓글 삭제 (대댓글이 없을 경우만) -->
     <delete id="deleteComment" parameterType="Long">
-        DELETE FROM comment WHERE comment_id = #{commentId} AND NOT EXISTS (
-            SELECT 1 FROM comment WHERE ref = #{commentId}
-        )
+        DELETE c FROM comment c
+    LEFT JOIN (SELECT DISTINCT parent_id FROM comment WHERE parent_id IS NOT NULL) sub
+    ON c.comment_id = sub.parent_id
+    WHERE c.comment_id = #{commentId} AND sub.parent_id IS NULL;
     </delete>
+
+
 
     <!-- 댓글 내용 수정 -->
     <update id="updateComment" parameterType="com.farmorai.backend.dto.CommentDto">
-        UPDATE comment SET content = #{content}, updated_at = now() WHERE comment_id = #{commentId}
+        UPDATE comment SET content = #{comment.content}, updated_at = now() WHERE comment_id = #{commentId}
     </update>
 
     <!-- 특정 ref 그룹 내에서 가장 깊은 depth 조회 -->

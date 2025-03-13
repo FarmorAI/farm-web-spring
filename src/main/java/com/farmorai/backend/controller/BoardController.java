@@ -33,10 +33,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RequestMapping("/api/board")
 public class BoardController {
     private final BoardService boardService;
-    private final FileUploadUtil fileUploadUtil = new FileUploadUtil();
-
-    @Value("${com.farmorai.upload.path}")
-    private String uploadPath;
 
     @GetMapping("/list")
     public ResponseEntity<PageResponseDto<BoardDto>> getNoticeList(PageRequestDto pageRequestDto) {
