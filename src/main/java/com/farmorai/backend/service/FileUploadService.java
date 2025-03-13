@@ -1,32 +1,43 @@
 package com.farmorai.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
+@Slf4j
 @Service
 public class FileUploadService {
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String fastApiUrl = "http://localhost:8000/detect";  // FastAPI 서버 주소
+    private final WebClient webClient;
 
-    public byte[] sendImage(MultipartFile file) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+    public FileUploadService(
+            WebClient.Builder webClientBuilder,
+            @Value("${fastapi.server.url}") String fastApiUrl
+    ) {
+        this.webClient = webClientBuilder.baseUrl(fastApiUrl).build();
+    }
 
+    /**
+     * 이미지 파일을 FastAPI 서버로 전송하고 응답을 받습니다.
+     * @param file 전송할 이미지 파일
+     * @return FastAPI 서버로부터 받은 응답 데이터를 Mono 형태로 반환
+     */
+    public Mono<Map<String, Object>> sendImageToFastApi(MultipartFile file) {
         // Multipart 요청 생성
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getOriginalFilename() + "\"\r\n").getBytes(StandardCharsets.UTF_8));
-        outputStream.write(("Content-Type: " + file.getContentType() + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
-        outputStream.write(file.getBytes());
-        outputStream.write("\r\n".getBytes(StandardCharsets.UTF_8));
+        Mono<Map<String, Object>> responseMono = webClient.post()
+                .uri("/analyze")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file.getResource()))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {});
 
-        HttpEntity<byte[]> requestEntity = new HttpEntity<>(outputStream.toByteArray(), headers);
-
-        ResponseEntity<byte[]> response = restTemplate.exchange(fastApiUrl, HttpMethod.POST, requestEntity, byte[].class);
-        return response.getBody();
+        return responseMono;
     }
 }

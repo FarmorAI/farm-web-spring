@@ -267,7 +267,7 @@ public class MemberService {
         return memberMapper.checkEmail(email);
     }
 
-
+    // 아이디 찾기
     public String findEmail(String name, String phone) {
         return memberMapper.findEmail(name,phone);
     }
