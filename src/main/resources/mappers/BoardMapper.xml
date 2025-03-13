@@ -7,7 +7,7 @@
     <select id="getBoardList" parameterType="com.farmorai.backend.dto.PageRequestDto" resultType="com.farmorai.backend.dto.BoardDto">
         SELECT b.board_id, b.title, m.nickname writer, b.content, b.views, b.created_at, b.updated_at
         FROM board b
-        inner join member m on b.member_id = b.member_id
+        inner join member m on b.member_id = m.member_id
         <where>
             1=1
             <if test="title != null and title != ''">
@@ -37,7 +37,7 @@
     <select id = "getBoardDetail" parameterType="Long" resultType="com.farmorai.backend.dto.BoardDto">
         SELECT b.board_id, b.title, m.nickname writer, b.content, b.views, b.created_at, b.updated_at
         FROM board b
-        inner join member m on m.member_id = m.member_id
+        inner join member m on b.member_id = m.member_id
         WHERE board_id = #{boardId}
     </select>
 
