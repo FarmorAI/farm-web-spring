@@ -38,7 +38,7 @@ class NoticeMapperTest {
     @Test
     @Rollback(value = false)
     void insertNotice() {
-        NoticeDto newNotice = new NoticeDto(null, "테스트제목1", "테스트내용1", null, 0, null, null);
+        NoticeDto newNotice = new NoticeDto(null, "테스트제목1", "테스트내용1", null, 0, null, null,null,null);
         noticeMapper.insertNotice(33L, newNotice);
     }
 

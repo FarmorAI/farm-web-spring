@@ -9,6 +9,8 @@ services:
       - bootstrap.memory_lock=true
     ports:
       - "9200:9200"
+    networks:
+      - elastic
     ulimits:
       memlock:
         soft: -1
@@ -17,3 +19,37 @@ services:
       resources:
         limits:
           memory: 4GB
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.3.3
+    container_name: kibana
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic
+    depends_on:
+      - elasticsearch
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.3.3
+    container_name: logstash
+    environment:
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/lib/mysql-connector-j-9.2.0.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar:ro
+    ports:
+      - "5001:5001"
+      - "5044:5044"
+    networks:
+      - elastic
+    depends_on:
+      - elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 2GB
+networks:
+  elastic:
+    driver: bridge

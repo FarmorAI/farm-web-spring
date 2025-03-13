@@ -9,7 +9,9 @@ spring:
   output:
     ansi:
       enabled: always
-
+  docker:
+    compose:
+      enabled: false
   servlet:
     multipart:
       enabled: true                 # 파일 업로드 활성화
