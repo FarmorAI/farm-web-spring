@@ -8,13 +8,10 @@
         FROM notice n
         inner join member m on n.member_id = m.member_id
         <where>
-            1=1
             <if test="title != null and title != ''">
                 AND title LIKE CONCAT('%', #{title}, '%')
             </if>
-            <if test="content != null and content != ''">
-                AND content LIKE CONCAT('%', #{content}, '%')
-            </if>
+
         </where>
         ORDER BY notice_id DESC
         LIMIT #{size} OFFSET #{offset}
@@ -55,4 +52,11 @@
     <delete id="deleteNotice" parameterType="Long">
         DELETE FROM notice WHERE notice_id = #{noticeId}
     </delete>
+    
+    <insert id="insertBatchNotice">
+        INSERT INTO notice (title, content, member_id, created_at, updated_at) VALUES
+        <foreach collection="notices" item="notice" separator=",">
+            (#{notice.title}, #{notice.content}, #{memberId}, now(), now())
+        </foreach>
+    </insert>
 </mapper>

@@ -123,6 +123,7 @@ public class PaymentController {
     ) {
         log.info("Request received: {}", request);
         List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
+        log.info("Items received: {}", items);
         String orderNumber = (String) request.get("orderNumber");
 
         if (items == null || items.isEmpty()) {
