@@ -44,4 +44,8 @@ public class SubsService {
     public void cancelSubs(String token) {
         subsMapper.cancelSubs(token);
     }
+
+    public SubsDto getSubsByMemberId(Long subsId) {
+        return subsMapper.getSubsByMemberId(subsId);
+    }
 }

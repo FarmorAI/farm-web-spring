@@ -9,6 +9,8 @@ import java.util.List;
 public interface SubsMapper {
     List<SubsDto> getAllSubs();
 
+    SubsDto getSubsByMemberId(Long memberId);
+
     void insertSubs(SubsDto subsDto);
 
     void cancelSubs(String token);
