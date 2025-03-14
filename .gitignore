@@ -8,6 +8,7 @@ build/
 src/main/resources/.env
 Dockerfile
 .dockerignore
+docker-compose.yaml
 
 ### STS ###
 .apt_generated
