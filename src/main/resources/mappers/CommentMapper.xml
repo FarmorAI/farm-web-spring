@@ -32,9 +32,10 @@
     <!-- 대댓글 존재 여부 확인 -->
     <select id="hasChildComments" parameterType="long" resultType="boolean">
         SELECT EXISTS (
-            SELECT 1 FROM comment WHERE ref = #{commentId} AND depth > 0
+            SELECT 1 FROM comment WHERE parent_id = #{commentId}
         )
     </select>
+
 
     <!-- 댓글 소프트 삭제 -->
     <update id="markCommentAsDeleted">
@@ -53,7 +54,7 @@
 
     <!-- 댓글 내용 수정 -->
     <update id="updateComment" parameterType="com.farmorai.backend.dto.CommentDto">
-        UPDATE comment SET content = #{comment.content}, updated_at = now() WHERE comment_id = #{commentId}
+        UPDATE comment SET content = #{content}, updated_at = now() WHERE comment_id = #{commentId}
     </update>
 
     <!-- 특정 ref 그룹 내에서 가장 깊은 depth 조회 -->
