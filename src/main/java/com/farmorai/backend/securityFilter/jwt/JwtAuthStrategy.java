@@ -1,7 +1,7 @@
 package com.farmorai.backend.securityFilter.jwt;
 
 import com.farmorai.backend.dto.MemberDto;
-import com.farmorai.backend.dto.response.ApiResponse;
+import com.farmorai.backend.global.response.ResponseApi;
 import com.farmorai.backend.mapper.MemberMapper;
 import com.farmorai.backend.securityFilter.AuthStrategy;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
@@ -67,7 +67,7 @@ public class JwtAuthStrategy implements AuthStrategy {
         // :흰색_확인_표시: 응답 데이터 생성
         // ✅ 응답 바디에 사용자 정보 추가
         objectMapper.writeValue(resp.getWriter(),
-               ApiResponse.success("로그인 성공", Map.of(
+               ResponseApi.success("로그인 성공", Map.of(
                        "token", token,
                        "user", Map.of(
                                "email", userDetails.getUsername(),

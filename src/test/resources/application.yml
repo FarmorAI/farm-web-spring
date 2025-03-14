@@ -1,6 +1,10 @@
 server:
   port: 6060
 
+logging:
+  level:
+    com.farmorai.backend.mapper: debug
+
 spring:
   output:
     ansi:
@@ -14,7 +18,7 @@ spring:
 
   datasource:
     hikari:
-      jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -52,3 +56,13 @@ naver:
     client-id: ${NAVERPAY_CLIENT_ID}
     client-secret: ${NAVERPAY_CLIENT_SECRET}
     chain-id: ${NAVERPAY_CHAIN_ID}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${AWS_S3_BUCKET}

@@ -1,11 +1,17 @@
 server:
   port: 6060
 
+logging:
+  level:
+    com.farmorai.backend.mapper: debug
+
 spring:
   output:
     ansi:
       enabled: always
-
+  docker:
+    compose:
+      enabled: false
   servlet:
     multipart:
       enabled: true                 # 파일 업로드 활성화

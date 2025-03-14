@@ -1,10 +1,12 @@
 package com.farmorai.backend.service;
 
 
+import com.farmorai.backend.domain.ProductDoc;
 import com.farmorai.backend.dto.NoticeDto;
 import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
 import com.farmorai.backend.mapper.NoticeMapper;
+import com.farmorai.backend.repository.NoticeDocRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,4 +53,6 @@ public class NoticeService {
     public void updateNotice(Long noticeId, NoticeDto noticeDto) {
         noticeMapper.updateNotice(noticeId, noticeDto);
     }
+
+
 }
