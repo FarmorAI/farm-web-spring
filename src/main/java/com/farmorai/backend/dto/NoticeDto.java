@@ -30,6 +30,4 @@ public class NoticeDto {
         this.title = title;
         this.content = content;
     }
-
-
 }
