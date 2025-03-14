@@ -54,4 +54,45 @@ public class MyPageService {
 
         return null;
     }
+
+    public List<Map<String, Object>> getMemberDataList(Long memberId) {
+        MyPageDto infoData = getMyInfo(memberId);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        if (infoData != null) {
+            // 1. memberData 처리
+            Map<String, Object> memberData = new HashMap<>();
+            memberData.put("email", infoData.getEmail());
+            memberData.put("nickname", infoData.getNickname());
+            memberData.put("phone", infoData.getPhone());
+            memberData.put("address", infoData.getAddress());
+            memberData.put("memberCreatedAt", infoData.getMemberCreatedAt());
+
+            // memberData를 resultList에 추가
+            resultList.add(memberData);
+
+            // 2. subscriptionData 처리
+            Map<String, Object> subscriptionData = new HashMap<>();
+            subscriptionData.put("planId", infoData.getPlanId());
+            subscriptionData.put("startDate", infoData.getStartDate());
+            subscriptionData.put("endDate", infoData.getEndDate());
+
+            // subscriptionData를 resultList에 추가
+            resultList.add(subscriptionData);
+
+            // 3. boardInfo 처리
+            List<Map<String, Object>> boardInfoList = infoData.getBoardInfo() != null ? infoData.getBoardInfo() : new ArrayList<>();
+            if (!boardInfoList.isEmpty()) {
+                resultList.add(Map.of("boardInfo", boardInfoList));
+            }
+
+            // 4. inquiryInfo 처리
+            List<Map<String, Object>> inquiryInfoList = infoData.getInquiryInfo() != null ? infoData.getInquiryInfo() : new ArrayList<>();
+            if (!inquiryInfoList.isEmpty()) {
+                resultList.add(Map.of("inquiryInfo", inquiryInfoList));
+            }
+        }
+
+        return resultList;
+    }
 }

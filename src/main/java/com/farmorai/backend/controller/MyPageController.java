@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,4 +25,16 @@ public class MyPageController {
 
     }
 
+    @GetMapping("/{memberId}/list")
+    public ResponseEntity<List<Map<String, Object>>> getMemberDataList(@PathVariable Long memberId) {
+        List<Map<String, Object>> memberDataList = mypageService.getMemberDataList(memberId);
+
+        // If no data is found, return 404
+        if (memberDataList == null || memberDataList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Return 200 OK with the list of maps
+        return ResponseEntity.ok(memberDataList);  // Return 200 OK with List<Map<String, Object>>
+    }
 }

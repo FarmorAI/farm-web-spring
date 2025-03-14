@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface MyPageMapper {
     MyPageDto getMyInfo(@Param("memberId") Long memberId);
+
 }
