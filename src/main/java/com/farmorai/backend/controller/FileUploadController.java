@@ -1,16 +1,20 @@
 package com.farmorai.backend.controller;
 
+import com.farmorai.backend.dto.AiResultDto;
+import com.farmorai.backend.dto.SubsDto;
+import com.farmorai.backend.dto.SubsStatus;
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.FileUploadService;
+import com.farmorai.backend.service.SubsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileUploadController {
     private final FileUploadService fileUploadService;
+    private final SubsService subsService;
 
     @Value("${com.farmorai.upload.path}")
     private String uploadPath;  // 파일 업로드 경로
@@ -31,8 +36,25 @@ public class FileUploadController {
      * @return processed image와 quality metrics
      */
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
+    public ResponseEntity<Map<String, Object>> uploadFiles(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("files") List<MultipartFile> files
+    ) {
         try {
+            // 인증 회원이 아니면
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            Long memberId = userDetails.getMemberId();
+            SubsDto subsDto = subsService.getSubsByMemberId(memberId);
+
+            // 구독 회원이 아니면
+            if (subsDto == null || subsDto.getStatus() != SubsStatus.ACTIVE) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // 파일이 없으면
             if (files == null || files.isEmpty()) {
                 return ResponseEntity.badRequest().body(createErrorResponse("파일 없음"));
             }
@@ -46,6 +68,15 @@ public class FileUploadController {
                 log.error("FastAPI 응답에 image_url이 없음");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(createErrorResponse("API 요청 오류"));
+            }
+
+            // AI 분석 결과 MySQL DB에 저장
+            AiResultDto aiResultDto = fileUploadService.insertAiResult(result, userDetails);
+
+            if (aiResultDto.getAiResultId() == null) {
+                log.error("AI 분석 결과 DB 저장 실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(createErrorResponse("구독자 전용: 구독 여부를 확인해주세요!"));
             }
             return ResponseEntity.ok(result);
 
@@ -68,34 +99,34 @@ public class FileUploadController {
         return response;
     }
 
-
-    /**
-    * File List 조회 API
-    */
-    @GetMapping("/files")
-    public ResponseEntity<List<String>> getUploadedFiles() {
-        File folder = new File(uploadPath);
-        String[] fileNames = folder.list();
-
-        if (fileNames == null || fileNames.length == 0) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(List.of());
+    @GetMapping("/ai")
+    public ResponseEntity<List<AiResultDto>> getAiResultList(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        // 인증 회원이 아니면
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(List.of(fileNames));
+
+        Long memberId = userDetails.getMemberId();
+        SubsDto subsDto = subsService.getSubsByMemberId(memberId);
+        if (subsDto.getPlanId() != 2L) {
+            // 프리미엄 회원이 아닐 경우,
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } else {
+            // 프리미엄 회원이면 정상 반환
+            return ResponseEntity.ok(fileUploadService.getAiResultList(memberId));
+        }
     }
 
-    /**
-     * File Download API
-     */
-    @GetMapping("files/{fileName}")
-    public ResponseEntity<Resource> getFile(@PathVariable String fileName) {
-        return null;
+    @GetMapping("/ai/{aiResultId}")
+    public ResponseEntity<AiResultDto> getAiResult(@PathVariable Long aiResultId) {
+        return ResponseEntity.ok(fileUploadService.getAiResult(aiResultId));
     }
 
-    /**
-     * File Delete API
-     */
-    @DeleteMapping("/files")
-    public ResponseEntity<Map<String, Object>> deleteFiles(@RequestBody List<String> fileNames) {
-        return null;
+    @DeleteMapping("/ai/{aiResultId}")
+    public ResponseEntity<String> deleteAiResult(@PathVariable Long aiResultId) {
+        fileUploadService.deleteAiResult(aiResultId);
+        return ResponseEntity.ok("AI 분석 결과 삭제 완료");
     }
 }

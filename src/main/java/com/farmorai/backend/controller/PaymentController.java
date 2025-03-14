@@ -123,6 +123,7 @@ public class PaymentController {
     ) {
         log.info("Request received: {}", request);
         List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
+        log.info("Items received: {}", items);
         String orderNumber = (String) request.get("orderNumber");
 
         if (items == null || items.isEmpty()) {
@@ -181,8 +182,12 @@ public class PaymentController {
 
         // PaymentDto 조회 및 업데이트
         PaymentDto paymentDto = paymentService.getPaymentById(pid);
-        SubsDto subsDto = subsService.insertSubs(paymentDto.getMemberId(), paymentDto.getPlanId());
-        paymentService.updatePayment(paymentDto, paymentId, subsDto.getSubsId());
+        if (paymentDto.getPlanId() < 3) {
+            SubsDto subsDto = subsService.insertSubs(paymentDto.getMemberId(), paymentDto.getPlanId());
+            paymentService.updatePayment(paymentDto, paymentId, subsDto.getSubsId());
+        } else {
+            paymentService.updatePayment(paymentDto, paymentId, null);
+        }
 
         // string encoding
         String encodedSubsPlan = URLEncoder.encode(subsPlan, StandardCharsets.UTF_8);
@@ -206,10 +211,10 @@ public class PaymentController {
 
     @PostMapping("/cancel")
     public Map<String, String> naverPayCancel(@RequestBody Map<String, String> reqBody) {
-        String paymentId = reqBody.get("paymentId");
-
-        subsService.cancelSubs(paymentId);
-        paymentService.refundPayment(paymentId);
-        return Map.of("result", paymentId);
+        String token = reqBody.get("token");
+        log.debug(token);
+        subsService.cancelSubs(token);
+        paymentService.refundPayment(token);
+        return Map.of("result", token);
     }
 }

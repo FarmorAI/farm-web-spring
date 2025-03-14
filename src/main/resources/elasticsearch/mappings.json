@@ -1,0 +1,12 @@
+{
+  "properties": {
+    "title": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "korean"
+    }
+  }
+}

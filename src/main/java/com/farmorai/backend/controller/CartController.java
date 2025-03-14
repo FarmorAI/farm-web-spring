@@ -1,7 +1,7 @@
 package com.farmorai.backend.controller;
 
 import com.farmorai.backend.dto.CartItemDto;
-import com.farmorai.backend.dto.response.ApiResponse;
+import com.farmorai.backend.global.response.ResponseApi;
 import com.farmorai.backend.securityFilter.CustomUserDetails;
 import com.farmorai.backend.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -21,21 +21,21 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> addCart(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId, int quantity) {
+    public ResponseEntity<ResponseApi<String>> addCart(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId, int quantity) {
         cartService.addCart(userDetails.getMemberId(), productId, quantity);
-        return ResponseEntity.ok(ApiResponse.success("장바구니가 생성되었습니다.", null));
+        return ResponseEntity.ok(ResponseApi.success("장바구니가 생성되었습니다.", null));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CartItemDto>>> getCartItemsByMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ResponseApi<List<CartItemDto>>> getCartItemsByMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
         List<CartItemDto> cartItems = cartService.getCartItemsByMemberId(userDetails.getMemberId());
-        return ResponseEntity.ok(ApiResponse.success("장바구니 목록 조회 성공", cartItems));
+        return ResponseEntity.ok(ResponseApi.success("장바구니 목록 조회 성공", cartItems));
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<String>> deleteCartItem(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId) {
+    public ResponseEntity<ResponseApi<String>> deleteCartItem(@AuthenticationPrincipal CustomUserDetails userDetails, Long productId) {
         cartService.deleteCartItem(userDetails.getMemberId(), productId);
-        return ResponseEntity.ok(ApiResponse.success( "장바구니 상품 삭제 성공", null));
+        return ResponseEntity.ok(ResponseApi.success( "장바구니 상품 삭제 성공", null));
     }
 
 

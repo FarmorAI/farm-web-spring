@@ -7,8 +7,8 @@
         SELECT * FROM Subscription
     </select>
 
-    <select id="getSubsById" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.SubsDto">
-        SELECT * FROM Payment WHERE subs_id = #{subsId}
+    <select id="getSubsByMemberId" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.SubsDto">
+        SELECT * FROM Subscription WHERE member_id = #{memberId} AND status = 'ACTIVE' LIMIT 1;
     </select>
 
     <insert id="insertSubs" parameterType="com.farmorai.backend.dto.SubsDto" useGeneratedKeys="true" keyProperty="subsId">
@@ -19,7 +19,7 @@
     <update id="cancelSubs" parameterType="string">
         UPDATE subscription s
         LEFT JOIN payment p ON s.subs_id = p.subs_id
-        SET s.status = 'CANCELED'
+        SET s.status = 'CANCELED', s.canceled_at = now()
         WHERE p.token = #{token};
     </update>
 </mapper>

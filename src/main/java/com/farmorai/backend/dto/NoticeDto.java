@@ -26,5 +26,10 @@ public class NoticeDto {
 
     private String updatedAt;
 
+    public NoticeDto(String title,String content){
+        this.title = title;
+        this.content = content;
+    }
+
 
 }
