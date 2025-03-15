@@ -21,4 +21,12 @@
         WHERE cart_id = #{cartId}
     </delete>
 
+    <delete id="deleteCartItem" parameterType="String">
+        DELETE FROM cart_item
+        WHERE cart_id IN (SELECT cart_id FROM cart WHERE member_id =
+                                                         (SELECT member_id FROM orders WHERE order_number = #{orderNumber}))
+          AND product_id IN (SELECT product_id FROM order_detail WHERE orders_id =
+                                                                       (SELECT orders_id FROM orders WHERE order_number = #{orderNumber}))
+    </delete>
+
 </mapper>

@@ -26,6 +26,11 @@
             VALUES (#{amount}, #{token}, #{paymentMethod}, #{status}, #{planId}, #{memberId}, #{subsId})
     </insert>
 
+    <insert id="insertProductPayment" parameterType="com.farmorai.backend.dto.PaymentDto" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO payment (amount, token, payment_method, status, member_id)
+            VALUES (#{amount}, #{token}, #{paymentMethod}, #{status}, #{memberId})
+    </insert>
+
     <update id="updatePayment" parameterType="Map">
         UPDATE payment SET
             token = #{token},

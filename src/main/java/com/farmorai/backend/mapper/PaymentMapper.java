@@ -14,6 +14,8 @@ public interface PaymentMapper {
 
     void insertPayment(PaymentDto paymentDto);
 
+    void insertProductPayment(PaymentDto paymentDto);
+
     PaymentDto getPaymentById(Long paymentId);
 
     void updatePayment(PaymentDto paymentDto);
