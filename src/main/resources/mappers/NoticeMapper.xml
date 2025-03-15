@@ -11,7 +11,6 @@
             <if test="title != null and title != ''">
                 AND title LIKE CONCAT('%', #{title}, '%')
             </if>
-
         </where>
         ORDER BY notice_id DESC
         LIMIT #{size} OFFSET #{offset}
