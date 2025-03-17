@@ -17,7 +17,6 @@ spring:
       enabled: true                 # 파일 업로드 활성화
       max-file-size: 50MB           # 파일 최대 크기
       max-request-size: 50MB        # 요청 최대 크기
-
   datasource:
     hikari:
       jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
