@@ -26,6 +26,7 @@ repositories {
 dependencies {
 	// .env for Spring
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
 	// Spring Security & JWT & OAuth2
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -52,8 +53,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-
-
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
