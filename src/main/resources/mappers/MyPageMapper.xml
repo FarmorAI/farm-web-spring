@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.farmorai.backend.mapper.MyPageMapper">
+    <select id = "getMyInfo" parameterType="Long" resultType="com.farmorai.backend.dto.MyPageDto">
+        SELECT
+            m.email,
+            m.nickname,
+            m.phone,
+            m.created_at AS member_created_at,
+            m.address,
+            s.plan_id,
+            s.start_date,
+            s.end_date,
+            GROUP_CONCAT(DISTINCT b.title ORDER BY b.created_at DESC SEPARATOR ', ') AS board_titles,
+            GROUP_CONCAT(DISTINCT b.created_at ORDER BY b.created_at DESC SEPARATOR ', ') AS board_created_dates,
+            GROUP_CONCAT(DISTINCT i.title ORDER BY i.created_at DESC SEPARATOR ', ') AS inquiry_titles,
+            GROUP_CONCAT(DISTINCT i.created_at ORDER BY i.created_at DESC SEPARATOR ', ') AS inquiry_created_dates
+        FROM member m
+                 LEFT JOIN subscription s ON m.member_id = s.member_id AND s.status = 'ACTIVE'
+                 LEFT JOIN board b ON m.member_id = b.member_id
+                 LEFT JOIN inquiry i ON m.member_id = i.member_id
+        WHERE m.member_id = #{memberId}
+        GROUP BY m.member_id, s.plan_id, s.start_date, s.end_date;
+    </select>
+</mapper>

@@ -35,6 +35,7 @@ repositories {
 dependencies {
 	// .env for Spring
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
 	// Spring Security & JWT & OAuth2
 	implementation 'org.springframework.boot:spring-boot-starter-security'
