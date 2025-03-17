@@ -39,6 +39,23 @@ public class PaymentService {
         return paymentDto;
     }
 
+    // PENDING : Payment 레코드 저장
+    public PaymentDto insertProductPayment(Long memberId, String Price){
+        PaymentDto paymentDto = new PaymentDto(
+                null,
+                Integer.parseInt(Price),
+                null,
+                null,
+                PaymentMethod.NAVERPAY,
+                PaymentStatus.PENDING,
+                null,
+                memberId,
+                null
+        );
+        paymentMapper.insertPayment(paymentDto);
+        return paymentDto;
+    }
+
     // COMPLETED : Payment 레코드 저장
     public void updatePayment(PaymentDto paymentDto, String paymentId, Long subsId) {
         paymentDto.setToken(paymentId);

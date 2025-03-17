@@ -21,4 +21,12 @@
         where product_id = #{productId}
     </select>
 
+    <!-- 재고 감소 (stock >= quantity 체크하여 음수가 되지 않도록 방지)    -->
+    <update id="decreaseStock">
+        update product
+        set stock = stock - #{quantity}
+        where product_id = #{productId}
+        AND stock >= #{quantity}
+    </update>
+
 </mapper>

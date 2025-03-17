@@ -8,7 +8,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface NoticeDocRepository{
+public interface ProductDocRepository {
+
+    @Query("""
+        {
+            "bool": {
+                "must": [
+                    { "match_all": {} }
+                ]
+            }
+        }
+        """)
+    List<ProductDoc> getProductList();
 
     @Query("""
         {
