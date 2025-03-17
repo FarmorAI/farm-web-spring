@@ -45,16 +45,14 @@ public class MyPageService {
                     inquiryInfo.put("created_at", inquiryCreatedDates[i]);
                     inquiryInfoList.add(inquiryInfo);
                 }
-
                 infoData.setInquiryInfo(inquiryInfoList);
             }
-
             return infoData;
         }
-
         return null;
     }
 
+    // 응답 정리
     public List<Map<String, Object>> getMemberDataList(Long memberId) {
         MyPageDto infoData = getMyInfo(memberId);
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -69,7 +67,7 @@ public class MyPageService {
             memberData.put("memberCreatedAt", infoData.getMemberCreatedAt());
 
             // memberData를 resultList에 추가
-            resultList.add(memberData);
+            resultList.add(Map.of("member",memberData));
 
             // 2. subscriptionData 처리
             Map<String, Object> subscriptionData = new HashMap<>();
@@ -78,21 +76,20 @@ public class MyPageService {
             subscriptionData.put("endDate", infoData.getEndDate());
 
             // subscriptionData를 resultList에 추가
-            resultList.add(subscriptionData);
+            resultList.add(Map.of("subscription",subscriptionData));
 
             // 3. boardInfo 처리
             List<Map<String, Object>> boardInfoList = infoData.getBoardInfo() != null ? infoData.getBoardInfo() : new ArrayList<>();
             if (!boardInfoList.isEmpty()) {
-                resultList.add(Map.of("boardInfo", boardInfoList));
+                resultList.add(Map.of("board", boardInfoList));
             }
 
             // 4. inquiryInfo 처리
             List<Map<String, Object>> inquiryInfoList = infoData.getInquiryInfo() != null ? infoData.getInquiryInfo() : new ArrayList<>();
             if (!inquiryInfoList.isEmpty()) {
-                resultList.add(Map.of("inquiryInfo", inquiryInfoList));
+                resultList.add(Map.of("inquiry", inquiryInfoList));
             }
         }
-
         return resultList;
     }
 }

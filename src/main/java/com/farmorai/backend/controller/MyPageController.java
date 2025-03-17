@@ -18,15 +18,16 @@ public class MyPageController {
     private final MyPageService mypageService;
 
     @GetMapping("/{memberId}")
-    public ResponseEntity<MyPageDto> getMyInfo(
-            @PathVariable Long memberId){
+    public ResponseEntity<MyPageDto> getMyInfo(@PathVariable Long memberId){
         MyPageDto infoData = mypageService.getMyInfo(memberId);
         return ResponseEntity.ok(infoData);
 
     }
 
-    @GetMapping("/{memberId}/list")
-    public ResponseEntity<List<Map<String, Object>>> getMemberDataList(@PathVariable Long memberId) {
+    @GetMapping("/list")
+    public ResponseEntity<List<Map<String, Object>>> getMemberDataList(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long memberId = userDetails.getMemberId();
         List<Map<String, Object>> memberDataList = mypageService.getMemberDataList(memberId);
 
         // If no data is found, return 404
@@ -35,6 +36,6 @@ public class MyPageController {
         }
 
         // Return 200 OK with the list of maps
-        return ResponseEntity.ok(memberDataList);  // Return 200 OK with List<Map<String, Object>>
+        return ResponseEntity.ok(memberDataList);
     }
 }
