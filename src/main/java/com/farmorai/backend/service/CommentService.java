@@ -2,10 +2,13 @@ package com.farmorai.backend.service;
 
 import com.farmorai.backend.dto.CommentDto;
 import com.farmorai.backend.mapper.CommentMapper;
+import com.farmorai.backend.securityFilter.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.access.AccessDeniedException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -16,12 +19,51 @@ public class CommentService {
 
     // 댓글 리스트 조회
     public List<CommentDto> getCommentList(Long boardId) {
-        return commentMapper.getCommentList(boardId);
+        // 첫 번째 단계: SQL에서 parent_id, depth로 이미 정렬된 댓글 목록을 가져옵니다.
+        List<CommentDto> comments = commentMapper.getCommentList(boardId);
+
+        // 두 번째 단계: 부모 댓글 뒤에 자식 댓글이 오도록 재정렬
+        List<CommentDto> sortedComments = new ArrayList<>();
+
+        // 부모 댓글을 먼저 처리하고, 그 뒤에 자식 댓글을 삽입합니다.
+        for (CommentDto comment : comments) {
+            if (comment.getParentId() == null) { // 부모 댓글을 찾음
+                // 부모 댓글은 먼저 추가
+                sortedComments.add(comment);
+                // 자식 댓글들을 해당 부모 댓글 뒤에 삽입
+                insertChildren(comment, comments, sortedComments);
+            }
+        }
+
+        return sortedComments;
+    }
+
+    private void insertChildren(CommentDto parent, List<CommentDto> comments, List<CommentDto> sortedComments) {
+        // 부모 댓글에 대한 자식 댓글들을 찾고, 그 자식 댓글들을 적절히 추가
+        List<CommentDto> children = new ArrayList<>();
+        for (CommentDto comment : comments) {
+            if (parent.getCommentId().equals(comment.getParentId())) {
+                children.add(comment);
+            }
+        }
+
+        // 자식 댓글들을 depth가 낮은 순서대로 정렬
+        children.sort(Comparator.comparingInt(CommentDto::getDepth));
+
+        // 자식 댓글들을 부모 댓글 뒤에 추가
+        for (CommentDto child : children) {
+            sortedComments.add(child);
+            // 자식 댓글에 대해서도 재귀적으로 자식 댓글을 추가
+            insertChildren(child, comments, sortedComments);
+        }
     }
 
     // 댓글 추가
     @Transactional
     public void insertComment(CommentDto commentDto) {
+        if (commentDto.getMemberId() == null) {
+            throw new IllegalArgumentException("Member ID가 누락되었습니다. 로그인 상태를 확인하세요.");
+        }
         if (commentDto.getParentId() == null) { // 원댓글이면 ref가 null
             // 원댓글 기본 값 설정
             commentDto.setDepth(0);
@@ -41,35 +83,41 @@ public class CommentService {
             commentDto.setDepth(maxDepth + 1);
             // 부모댓글의 level 값에 +1로 설정
             commentDto.setLevel(parent.getLevel() + 1);
-
             commentDto.setRef(parent.getRef());
-
             commentMapper.insertComment(commentDto);
         }
     }
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long commentId) {
-        if (commentMapper.getCommentById(commentId) == null) {
-            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
-        }
+    public void deleteComment(Long commentId, Long userId) {
+        try {
+            CommentDto comment = commentMapper.getCommentById(commentId);
 
-        if (commentMapper.hasChildComments(commentId)) {
-            commentMapper.markCommentAsDeleted(commentId); // 내용만 변경 (소프트 삭제)
-        } else {
-            commentMapper.deleteComment(commentId); // 실제 삭제
+
+            // 댓글 작성자 ID 가져오기 (CommentDto 기준)
+            Long commentOwnerId = comment.getMemberId(); // CommentDto에서 userId 가져오기
+
+            // 댓글 작성자가 현재 사용자와 일치하는지 확인
+            if (!commentOwnerId.equals(userId)) {
+                throw new AccessDeniedException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+            }
+
+            // 대댓글이 있는 경우 → 소프트 삭제
+            if (commentMapper.hasChildComments(commentId)) {
+                commentMapper.markCommentAsDeleted(commentId);
+            } else { // 대댓글이 없는 경우 → 실제 삭제
+                commentMapper.deleteComment(commentId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("댓글 삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 댓글 수정
     @Transactional
     public void updateComment(Long commentId, CommentDto commentDto) {
-        CommentDto existingComment = commentMapper.getCommentById(commentId);
-        if (existingComment == null) {
-            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
-        }
-
         commentMapper.updateComment(commentId, commentDto);
     }
 }
