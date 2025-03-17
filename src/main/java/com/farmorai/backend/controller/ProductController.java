@@ -1,5 +1,6 @@
 package com.farmorai.backend.controller;
 
+import com.farmorai.backend.domain.ProductDoc;
 import com.farmorai.backend.dto.ProductDto;
 import com.farmorai.backend.global.response.ResponseApi;
 import com.farmorai.backend.service.ProductService;
@@ -34,6 +35,18 @@ public class ProductController {
         Optional<ProductDto> product = productService.getProductById(productId);
         return ResponseEntity.ok(ResponseApi.success("상품 조회 성공", product.orElseThrow()));
     }
+
+//    @GetMapping
+//    public ResponseApi<List<ProductDoc>> getProductDocList() {
+//        List<ProductDoc> productDocList = productService.getProductDocList();
+//        log.info("getProductDocList: {}", productDocList);
+//        return ResponseApi.success("상품 조회 성공", productService.getProductDocList());
+//    }
+//
+//    @GetMapping("/all")
+//    public ResponseEntity<ResponseApi<List<ProductDoc>>> getAllProducts() {
+//        return ResponseEntity.ok(ResponseApi.success("상품 조회 성공", productService.getAllProducts()));
+//    }
 
     @PostMapping
     public ResponseEntity<ResponseApi<String>> registerProduct(@RequestPart("product") ProductDto productDto,

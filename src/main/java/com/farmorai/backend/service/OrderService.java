@@ -5,7 +5,9 @@ import com.farmorai.backend.dto.OrderItemDto;
 import com.farmorai.backend.dto.OrderRequestDto;
 import com.farmorai.backend.dto.OrderResponseDto;
 import com.farmorai.backend.dto.OrderStatus;
+import com.farmorai.backend.mapper.CartMapper;
 import com.farmorai.backend.mapper.OrderMapper;
+import com.farmorai.backend.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import static java.util.stream.Collectors.groupingBy;
 public class OrderService {
 
     private final OrderMapper orderMapper;
+    private final ProductMapper productMapper;
+    private final CartMapper cartMapper;
 
     @Transactional
     public OrderResponseDto insertOrder(Long memberId, OrderRequestDto orderRequestDto) {
@@ -39,6 +43,19 @@ public class OrderService {
     @Transactional
     public void updateOrderStatus(String orderNumber, String paymentId) {
         orderMapper.updateOrderStatus(orderNumber, paymentId, OrderStatus.PAID);
+    }
+
+    @Transactional
+    public void processOrderAfterPayment(String orderNumber, String paymentId) {
+        List<OrderItemDto> orderItems = orderMapper.getOrderByNumber(orderNumber);
+        if (orderItems.isEmpty()) {
+            throw new RuntimeException("No order items found for order number: " + orderNumber);
+        }
+        orderMapper.updateOrderStatus(orderNumber, paymentId, OrderStatus.PAID);
+        orderItems.forEach(item -> {
+            productMapper.decreaseStock(item.getProductId(), item.getQuantity());
+        });
+        cartMapper.deleteCartItem(orderNumber);
     }
 
     // 주문 조회 (주문 번호)

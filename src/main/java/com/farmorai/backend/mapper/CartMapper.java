@@ -13,4 +13,5 @@ public interface CartMapper {
 
     void deleteCart(Long cartId);
 
+    void deleteCartItem(String orderNumber);
 }

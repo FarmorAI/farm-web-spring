@@ -27,6 +27,8 @@ public class OrderController {
     //주문 생성
     @PostMapping
     public ResponseEntity<ResponseApi<OrderResponseDto>> insertOrder(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody OrderRequestDto orderRequestDto) {
+        log.info("userDetails: {}", userDetails);
+        log.info("Insert order request: {}", orderRequestDto);
         OrderResponseDto orderResponseDto = orderService.insertOrder(userDetails.getMemberId(), orderRequestDto);
         return ResponseEntity.status(CREATED).body(ResponseApi.success("주문 생성 성공", orderResponseDto, CREATED));
     }

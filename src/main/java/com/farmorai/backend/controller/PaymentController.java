@@ -135,15 +135,14 @@ public class PaymentController {
                 .mapToInt(item -> ((Number) item.get("price")).intValue() * ((Number) item.get("quantity")).intValue())
                 .sum();
 
-        // PaymentDto 생성 (장바구니는 subsPlan 대신 "Cart"로 고정)
-        PaymentDto paymentDto = paymentService.insertPayment(userDetails.getMemberId(), "Cart", String.valueOf(totalAmount));
+        PaymentDto paymentDto = paymentService.insertProductPayment(userDetails.getMemberId(), String.valueOf(totalAmount));
         String pid = "pid" + paymentDto.getPaymentId();
         String encodedPid = Base64.getEncoder().encodeToString(pid.getBytes(StandardCharsets.UTF_8));
 
         // NaverPay API 요청 정보
         NaverPayInfoDto payInfo = NaverPayInfoDto.builder()
                 .merchantPayKey(UUID.randomUUID().toString())
-                .productName("장바구니 결제 (" + items.size() + "건)")
+                .productName("상품 결제 (" + items.size() + "건)")
                 .productCount(items.size())
                 .totalPayAmount(totalAmount)
                 .taxScopeAmount(totalAmount)
@@ -182,7 +181,7 @@ public class PaymentController {
 
         // PaymentDto 조회 및 업데이트
         PaymentDto paymentDto = paymentService.getPaymentById(pid);
-        if (paymentDto.getPlanId() < 3) {
+        if (paymentDto.getPlanId() != null) {
             SubsDto subsDto = subsService.insertSubs(paymentDto.getMemberId(), paymentDto.getPlanId());
             paymentService.updatePayment(paymentDto, paymentId, subsDto.getSubsId());
         } else {
@@ -194,7 +193,7 @@ public class PaymentController {
         String redirectUrl;
         if("Cart".equals(subsPlan)) {
         // cartService.deleteCartItem(subsDto.getMemberId(), );
-            orderService.updateOrderStatus(orderNumber,paymentId);
+            orderService.processOrderAfterPayment(orderNumber,paymentId);
             redirectUrl = "http://localhost:3030/cart/payment/result?orderNumber=" + orderNumber+"&";
         }
         else {
