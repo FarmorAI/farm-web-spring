@@ -80,7 +80,7 @@ public class SecurityConfig {
     // HTTP 요청 경로별 인가 설정
     private void configAuthHttpReq(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
         authz.requestMatchers("/**").hasRole(MemberRole.ADMIN.name())
-            .requestMatchers("/api/**").hasAnyRole(MemberRole.USER.name())
+            .requestMatchers("/**").hasAnyRole(MemberRole.USER.name())
             .requestMatchers("/api/weather/**", "/api/info/**").permitAll();
     }
 
