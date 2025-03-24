@@ -79,9 +79,16 @@ public class SecurityConfig {
 
     // HTTP 요청 경로별 인가 설정
     private void configAuthHttpReq(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
-        authz.requestMatchers("/**").hasRole(MemberRole.ADMIN.name())
-            .requestMatchers("/api/**").hasAnyRole(MemberRole.USER.name())
-            .requestMatchers("/api/weather/**", "/api/info/**").permitAll();
+        authz.requestMatchers(
+                "/api/login", "/api/register", "/api/weather/**",
+                        "/api/info/**", "/api/board/**", "/api/notice/**",
+                        "/api/analysis/**", "/api/distribution", "/api/social/**"
+                ).permitAll()
+            .requestMatchers(
+                    "/api/payment/**", "/api/cart/**", "/api/order/**",
+                    "/api/product/**", "/api/mypage/**", "/api/inquiry/**",
+                    "/api/**", "/api/member/**"
+            ).hasAnyRole(MemberRole.USER.name(), MemberRole.ADMIN.name());
     }
 
     // login 설정
