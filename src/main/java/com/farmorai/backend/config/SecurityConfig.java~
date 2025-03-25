@@ -87,7 +87,9 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/cart/**", "/api/order/**").hasAnyRole("USER", "ADMIN")   // 경로별 인가 설정
+                        .requestMatchers(
+                                "/api/payment/naverpay/**", "/api/cart/**", "/api/order/**"
+                        ).hasAnyRole("USER", "ADMIN")   // 경로별 인가 설정
                         .anyRequest().permitAll()         // 나머지 요청은 공개
                 )
                 .addFilterAt(authFilter(authManager), UsernamePasswordAuthenticationFilter.class)  // 로그인 필터 추가
