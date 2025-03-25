@@ -19,9 +19,9 @@ public class ResponseAspect {
                      @org.springframework.web.bind.annotation.RestController *
                  )
                  &&
-                 (
+                 ( 
                      @annotation(org.springframework.web.bind.annotation.GetMapping)
-                     ||
+                    ||
                      @annotation(org.springframework.web.bind.annotation.PostMapping)
                      ||
                      @annotation(org.springframework.web.bind.annotation.PutMapping)
