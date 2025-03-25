@@ -25,7 +25,7 @@ public class CommentService {
         // 두 번째 단계: 부모 댓글 뒤에 자식 댓글이 오도록 재정렬
         List<CommentDto> sortedComments = new ArrayList<>();
 
-        // 부모 댓글을 먼저 처리하고, 그 뒤에 자식 댓글을 삽입합니다.
+        // 부모 댓글을 먼저 처리하고, 그 뒤에 자식 댓글을 삽입.
         for (CommentDto comment : comments) {
             if (comment.getParentId() == null) { // 부모 댓글을 찾음
                 // 부모 댓글은 먼저 추가
@@ -64,7 +64,7 @@ public class CommentService {
         if (commentDto.getMemberId() == null) {
             throw new IllegalArgumentException("Member ID가 누락되었습니다. 로그인 상태를 확인하세요.");
         }
-        if (commentDto.getParentId() == null) { // 원댓글이면 ref가 null
+        if (commentDto.getParentId() == null) {
             // 원댓글 기본 값 설정
             commentDto.setDepth(0);
             commentDto.setLevel(0);
