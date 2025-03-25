@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -251,8 +252,12 @@ public class MemberService {
 
     private String makeTempPassword() {
         StringBuilder buffer = new StringBuilder();
+        SecureRandom secureRandom = new SecureRandom();
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+
         for (int i = 0; i < 10; i++) {
-            buffer.append((char) ((Math.random() * 55) + 65));
+            int randomIndex = secureRandom.nextInt(chars.length());
+            buffer.append(chars.charAt(randomIndex));
         }
         return buffer.toString();
     }

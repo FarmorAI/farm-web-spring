@@ -10,6 +10,8 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
@@ -22,6 +24,23 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class InfoService {
+    /**
+     * 기본적으로 XML을 파싱할 때, 외부 엔터티를 허용하므로 XXE 공격을 방지하는 코드 추가
+     */
+    private DocumentBuilderFactory secureDocumentBuilderFactory() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);   // DOCTYPE 선언을 비활성화
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);   // 외부 엔터티 사용을 금지
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);   // 외부 파라미터 엔터티 사용을 금지
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);  // 외부 DTD 로딩을 금지
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        factory.setExpandEntityReferences(false);
+        return factory;
+    }
+
 
     @Value("${KAKAO_API_KEY}")
     private String apiKey;
@@ -123,7 +142,7 @@ public class InfoService {
     // ✅ XML에서 atchmnflUrl 추출
     private String parseAtchmnflUrl(String xmlString){
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = secureDocumentBuilderFactory();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(xmlString)));
 
@@ -167,7 +186,7 @@ public class InfoService {
         List<Map<String, String>> resultList = new ArrayList<>();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = secureDocumentBuilderFactory();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(xmlString)));
 
@@ -200,7 +219,7 @@ public class InfoService {
         List<Map<String, String>> resultList = new ArrayList<>();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = secureDocumentBuilderFactory();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(xmlString)));
 

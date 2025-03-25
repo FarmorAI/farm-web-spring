@@ -10,7 +10,7 @@ sonarqube {
 	properties {
 		property "sonar.projectKey", "mytest"
 		property "sonar.host.url", "http://localhost:9000"
-		property "sonar.login", "sqp_28ddf76416f7c5e26da40bc92ee411d392f99ceb"
+		property "sonar.login", "sqp_44d39c0e20b4e6c2677db3ee78e9f040463382c8"
 	}
 }
 
