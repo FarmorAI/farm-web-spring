@@ -58,7 +58,6 @@ public class JwtAuthStrategy implements AuthStrategy {
 
         MemberDto member = memberMapper.getMemberByEmail(userDetails.getUsername());
 
-
         resp.addHeader("Authorization", "Bearer " + token);
 
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
