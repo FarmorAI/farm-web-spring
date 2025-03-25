@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -64,7 +65,7 @@ public class SecurityConfig {
     protected SecurityFilterChain securityFilterChain(
             HttpSecurity http, AuthenticationManager authManager
     ) throws Exception {
-        http.csrf((auth) -> auth.disable())                            // CSRF 비활성화
+        http.csrf(Customizer.withDefaults())                                                   // CSRF 비활성화
             .cors(cors -> cors.configurationSource(corsSource()))      // CORS 설정 활성화
             .formLogin((auth) -> auth.disable())
             .httpBasic((auth) -> auth.disable())

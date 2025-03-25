@@ -120,21 +120,7 @@ public class MemberController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest request
     ) {
-//        // Authorization 헤더에서 JWT 토큰 추출
-//        String authorizationHeader = request.getHeader("Authorization");
-//        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//
-//        // "Bearer " 제거 후 토큰 추출
-//        String token = authorizationHeader.substring(7);
-//        if (jwtTokenProvider.isJwtExpired(token)) {
-//            return ResponseEntity.status(401).build();
-//        }
-//        // JWT에서 이메일 추출
-//        String email = jwtTokenProvider.getEmail(token);
-
-        MemberDto member = memberService.getMemberByEmail(userDetails.getUsername());
+        MemberDto member = memberService.getMemberById(userDetails.getMemberId());
         return ResponseEntity.ok(member);
     }
 

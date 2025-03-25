@@ -48,7 +48,7 @@ public class InquiryService {
 
     // 문의 추가
     public ResponseEntity<String> insertInquiry(InquiryDto inquiryDto, CustomUserDetails userDetails) {
-        inquiryDto.setMemberId(userDetails.getMemberId());
+        inquiryDto.setMemberId(userDetails.getMemberId() == null ? 100L : userDetails.getMemberId());
         inquiryDto.setWriter(userDetails.getNickname());
         inquiryMapper.insertInquiry(inquiryDto);
         return ResponseEntity.ok("Success");

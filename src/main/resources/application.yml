@@ -17,7 +17,6 @@ spring:
       enabled: true                 # 파일 업로드 활성화
       max-file-size: 50MB           # 파일 최대 크기
       max-request-size: 50MB        # 요청 최대 크기
-
   datasource:
     hikari:
       jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
@@ -68,3 +67,26 @@ cloud:
         static: ap-northeast-2
       s3:
         bucket: ${AWS_S3_BUCKET}
+
+
+# swagger
+# http://localhost:6060/swagger-ui/index.html#/
+springdoc:
+  api-docs:
+    path: /api-docs # API 문서 생성 경로
+    groups:
+      enabled: true
+  swagger-ui:
+    path: /index.html # Swagger-ui 경로
+    enabled: true
+    groups-order: asc
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  cache:
+    disabled: true
+  override-with-generic-response: false
+  model-and-view-allowed: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

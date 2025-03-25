@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ResponseAspect {
     private final HttpServletResponse response;
+
     @Around("""
              (
                  within
@@ -41,6 +42,4 @@ public class ResponseAspect {
         }
         return proceed;
     }
-
-
 }
