@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("api/inquiry")
+@RequestMapping("/api/inquiry")
 @RequiredArgsConstructor
 public class InquiryController {
     private final InquiryService inquiryService;

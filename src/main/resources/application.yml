@@ -3,7 +3,11 @@ server:
 
 logging:
   level:
-    com.farmorai.backend.mapper: debug
+    com.farmorai.backend.mapper: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.authentication: DEBUG
+    org.springframework.security.web: DEBUG
+    org.springframework.security.web.authentication: TRACE
 
 spring:
   output:
