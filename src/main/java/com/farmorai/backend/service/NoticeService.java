@@ -6,11 +6,16 @@ import com.farmorai.backend.dto.PageRequestDto;
 import com.farmorai.backend.dto.PageResponseDto;
 import com.farmorai.backend.mapper.NoticeMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -20,6 +25,18 @@ public class NoticeService {
 
 
     public PageResponseDto<NoticeDto> getNoticeList(PageRequestDto pageRequestDto) {
+        List<NoticeDto> noticeList = noticeMapper.getNoticeList(pageRequestDto);
+        int totalCount = noticeMapper.getNoticeListCount(pageRequestDto);
+        return PageResponseDto.<NoticeDto>builder()
+                .dtoList(noticeList)
+                .pageRequestDto(pageRequestDto)
+                .total(totalCount)
+                .build();
+    }
+
+    @Cacheable(value = "noticeList", key = "#pageRequestDto.page + '-' + #pageRequestDto.size")
+    public PageResponseDto<NoticeDto> getCachedNoticeList(PageRequestDto pageRequestDto) {
+        log.info("캐시 MISS! DB에서 공지사항 조회 후 Redis에 저장");
         List<NoticeDto> noticeList = noticeMapper.getNoticeList(pageRequestDto);
         int totalCount = noticeMapper.getNoticeListCount(pageRequestDto);
         return PageResponseDto.<NoticeDto>builder()

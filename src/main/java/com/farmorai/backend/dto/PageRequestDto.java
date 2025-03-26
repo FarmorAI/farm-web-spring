@@ -1,6 +1,7 @@
 package com.farmorai.backend.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class PageRequestDto {
     private String title;
     private String content;
 
+    @JsonIgnore
     public int getOffset() {
         return (page - 1) * size; // 몇 번째 데이터부터 가져올지 OFFSET을 구하는 메서드
     }

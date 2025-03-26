@@ -7,6 +7,8 @@ import com.farmorai.backend.service.ProductService;
 import com.farmorai.backend.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +50,12 @@ public class ProductController {
 //        return ResponseEntity.ok(ResponseApi.success("상품 조회 성공", productService.getAllProducts()));
 //    }
 
+//    @GetMapping("/elastic")
+//    public ResponseEntity<ResponseApi<List<ProductDoc>>> searchByKeyword(@Param("keyword") String keyword) {
+//        return ResponseEntity.ok(ResponseApi.success("상품 조회 성공", productService.searchByKeyword(keyword)));
+//    }
+
+
     @PostMapping
     public ResponseEntity<ResponseApi<String>> registerProduct(@RequestPart("product") ProductDto productDto,
                                                                @RequestPart("file") MultipartFile file) {
@@ -56,6 +64,13 @@ public class ProductController {
         productDto.setImageUrl(s3Service.uploadFile(file));
         productService.registerProduct(productDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseApi.success("상품 등록 성공", "success"));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProductDto>> searchProductList(@Param("keyword") String keyword,
+                                                              @Param("page") int page,
+                                                              @Param("size") int size) {
+        return ResponseEntity.ok(productService.searchProductList(keyword,page,size));
     }
 
 

@@ -13,23 +13,15 @@ import lombok.NoArgsConstructor;
 public class NoticeDto {
 
     private Long noticeId;
-
     private String title;
-
     private String content;
-
     private String writer;
-
     private int views;
-
     private String createdAt;
-
     private String updatedAt;
 
     public NoticeDto(String title,String content){
         this.title = title;
         this.content = content;
     }
-
-
 }

@@ -1,15 +1,20 @@
 package com.farmorai.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Data
-public class PageResponseDto<E>{ // 페이징 결과 DTO
+@NoArgsConstructor
+public class PageResponseDto<E> implements Serializable { // 페이징 결과 DTO
 
     private List<E> dtoList; // 조회된 데이터 리스트
     private List<Integer> pageNumList; // 페이지 번호 리스트
@@ -20,7 +25,10 @@ public class PageResponseDto<E>{ // 페이징 결과 DTO
     private int totalCount, prevPage, nextPage, totalPage, current;
 
     @Builder
-    public PageResponseDto(List<E> dtoList, List<Integer> pageNumList, PageRequestDto pageRequestDto, long total) {
+    @JsonCreator
+    public PageResponseDto(@JsonProperty("dtoList") List<E> dtoList,
+                           @JsonProperty("pageRequestDto") PageRequestDto pageRequestDto,
+                           @JsonProperty("totalCount") long total) {
         this.dtoList = dtoList;
         this.pageRequestDto = pageRequestDto;
         this.totalCount = (int) total;
