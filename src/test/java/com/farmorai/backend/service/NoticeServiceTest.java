@@ -6,9 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,9 +20,41 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 class NoticeServiceTest {
 
-
     @Autowired
     private TestRestTemplate restTemplate;
+
+    private static final int THREAD_COUNT = 100;
+
+    @Test
+    void 공지사항_API_멀티스레드_응답시간_테스트() throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
+        List<Long> responseTimes = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            executorService.execute(() -> {
+                try {
+                    long start = System.currentTimeMillis();
+                    ResponseEntity<String> response = restTemplate.getForEntity("/api/notice/list", String.class);
+                    long end = System.currentTimeMillis();
+                    responseTimes.add(end - start);
+                } catch (Exception e) {
+                    log.error("요청 실패", e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await(); // 모든 스레드 완료 대기
+        executorService.shutdown();
+
+        long totalTime = responseTimes.stream().mapToLong(Long::longValue).sum();
+        long average = totalTime / responseTimes.size();
+
+        log.info("✅ 총 요청 수: {}", THREAD_COUNT);
+        log.info("📊 평균 응답시간: {} ms", average);
+        log.info("📉 최소 응답시간: {} ms", responseTimes.stream().min(Long::compare).orElse(0L));
+        log.info("📈 최대 응답시간: {} ms", responseTimes.stream().max(Long::compare).orElse(0L));
+    }
 
     @Test
     void 공지사항_API_응답시간_테스트() {
