@@ -32,6 +32,7 @@ public class NoticeController {
 
     @GetMapping("/list")
     public ResponseEntity<PageResponseDto<NoticeDto>> getNoticeList(PageRequestDto pageRequestDto) {
+//        return ResponseEntity.ok(noticeService.getCachedNoticeList(pageRequestDto));
         return ResponseEntity.ok(noticeService.getNoticeList(pageRequestDto));
     }
 

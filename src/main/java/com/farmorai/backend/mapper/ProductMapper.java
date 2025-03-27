@@ -15,5 +15,13 @@ public interface ProductMapper {
 
     Optional<ProductDto> getProductById(Long productId);
 
-    void decreaseStock(@Param("productId") Long productId,@Param("quantity") int quantity);
+    int decreaseStock(@Param("productId") Long productId,@Param("quantity") int quantity);
+
+    void batchRegisterProduct(List<ProductDto> productList);
+
+    List<ProductDto> searchProductList(@Param("keyword") String keyword,
+                                       @Param("size") int size,
+                                       @Param("offset") int offset);
+
+    int getProductCount(@Param("keyword") String keyword);
 }

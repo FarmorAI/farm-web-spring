@@ -6,10 +6,26 @@ logging:
     com.farmorai.backend.mapper: debug
 
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      connect-timeout: 1000ms
+      timeout: 3000ms
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 500ms
   output:
     ansi:
       enabled: always
-
+  docker:
+    compose:
+      enabled: false
   servlet:
     multipart:
       enabled: true                 # 파일 업로드 활성화
@@ -18,12 +34,12 @@ spring:
 
   datasource:
     hikari:
-      jdbc-url: jdbc:mysql://${DB_HOST}:3306/farmdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      jdbc-url: ${DB_URL}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driver-class-name: com.mysql.cj.jdbc.Driver
       minimum-idle: 5                # 최소 유지 커넥션 수
-      maximum-pool-size: 20          # 최대 커넥션 수 (트래픽 증가 대비)
+      maximum-pool-size: 30          # 최대 커넥션 수 (트래픽 증가 대비)
       idle-timeout: 60000            # 유휴 커넥션 유지 시간 (밀리초)
       max-lifetime: 1800000          # 커넥션 최대 유지 시간 (밀리초)
       connection-timeout: 30000      # 커넥션 요청 대기 시간 (밀리초)

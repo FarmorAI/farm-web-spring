@@ -4,9 +4,18 @@
 
 <mapper namespace="com.farmorai.backend.mapper.ProductMapper">
 
-    <insert id="registerProduct" parameterType="com.farmorai.backend.dto.ProductDto" useGeneratedKeys="true" keyProperty="productId">
+    <insert id="registerProduct" parameterType="com.farmorai.backend.dto.ProductDto" useGeneratedKeys="true"
+            keyProperty="productId">
+        INSERT INTO product (name, variety, price, stock, description, image_url, created_at, updated_at)
+        VALUES (#{name}, #{variety}, #{price}, #{stock}, #{description}, #{imageUrl}, now(), now())
+    </insert>
+
+    <insert id="batchRegisterProduct" parameterType="java.util.List">
         INSERT INTO product (name, variety, price, stock, description, image_url,created_at, updated_at)
-        VALUES (#{name}, #{variety} ,#{price}, #{stock}, #{description}, #{imageUrl}, now(), now())
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.name}, #{item.variety}, #{item.price}, #{item.stock}, #{item.description}, "https://farmorai-bucket00.s3.ap-northeast-2.amazonaws.com/c383d3af-65dd-45c3-921b-0cb0cf0c4289_introduce1.png", now(), now())
+        </foreach>
     </insert>
 
 
@@ -26,7 +35,21 @@
         update product
         set stock = stock - #{quantity}
         where product_id = #{productId}
-        AND stock >= #{quantity}
+          AND stock >= #{quantity}
     </update>
+    
+    <select id="searchProductList" resultType="com.farmorai.backend.dto.ProductDto">
+        select product_id, name, variety, price, stock, description, image_url, created_at, updated_at
+        from product
+        where name like concat('%', #{keyword}, '%')
+        order by product_id desc
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+    
+    <select id="getProductCount" resultType="int">
+        select count(*)
+        from product
+        where name like concat('%', #{keyword}, '%')
+    </select>
 
 </mapper>
