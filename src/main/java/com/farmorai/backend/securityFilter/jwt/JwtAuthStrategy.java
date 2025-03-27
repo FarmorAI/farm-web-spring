@@ -25,7 +25,6 @@ import java.util.Map;
  * @ConditionalOnProperty
  * : spring.auth.strategy 값(jwt)에 따라 Bean 등록 여부를 동적으로 결정
  */
-
 @Log4j2
 @Component
 @RequiredArgsConstructor
@@ -58,7 +57,6 @@ public class JwtAuthStrategy implements AuthStrategy {
         );
 
         MemberDto member = memberMapper.getMemberByEmail(userDetails.getUsername());
-
 
         resp.addHeader("Authorization", "Bearer " + token);
 

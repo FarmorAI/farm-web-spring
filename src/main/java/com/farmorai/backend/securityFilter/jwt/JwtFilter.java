@@ -10,12 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 요청 헤더 "Authorization" 키에 JWT가 존재할 경우, JWT 검증을 위한 커스텀 필터 등록 필요
@@ -89,7 +91,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String nickname = jwtTokenProvider.getNickname(token);
         String role = jwtTokenProvider.getRole(token);    // token -> role
         List<SimpleGrantedAuthority> auth = jwtTokenProvider.getAuthorities(role);
-        CustomUserDetails principal = new CustomUserDetails(memberId,email, "",auth, nickname);
+        CustomUserDetails principal = new CustomUserDetails(memberId,email, "", auth, nickname);
 
         return new UsernamePasswordAuthenticationToken(
                 principal, null, principal.getAuthorities()

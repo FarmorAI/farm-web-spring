@@ -74,7 +74,11 @@ public class PaymentController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody Map<String, String> reqBody
     ) {
-        log.debug(userDetails.toString());
+        // 인증되지 않은 사용자 처리
+        if (userDetails == null) {
+            return Mono.fromSupplier(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다."));
+        }
+
         String subsPlan = reqBody.get("subsPlan");
         String subsPrice = reqBody.get("subsPrice");
 

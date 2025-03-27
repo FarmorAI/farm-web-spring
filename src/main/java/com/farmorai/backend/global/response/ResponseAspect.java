@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ResponseAspect {
     private final HttpServletResponse response;
+
     @Around("""
              (
                  within
@@ -19,9 +20,9 @@ public class ResponseAspect {
                      @org.springframework.web.bind.annotation.RestController *
                  )
                  &&
-                 (
+                 ( 
                      @annotation(org.springframework.web.bind.annotation.GetMapping)
-                     ||
+                    ||
                      @annotation(org.springframework.web.bind.annotation.PostMapping)
                      ||
                      @annotation(org.springframework.web.bind.annotation.PutMapping)
@@ -41,6 +42,4 @@ public class ResponseAspect {
         }
         return proceed;
     }
-
-
 }
