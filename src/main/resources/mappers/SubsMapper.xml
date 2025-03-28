@@ -8,7 +8,7 @@
     </select>
 
     <select id="getSubsByMemberId" parameterType="java.lang.Long" resultType="com.farmorai.backend.dto.SubsDto">
-        SELECT * FROM Subscription WHERE member_id = #{memberId} AND status = 'ACTIVE' LIMIT 1;
+        SELECT * FROM Subscription WHERE member_id = #{memberId} AND status = 'ACTIVE' ORDER BY created_at DESC LIMIT 1;
     </select>
 
     <insert id="insertSubs" parameterType="com.farmorai.backend.dto.SubsDto" useGeneratedKeys="true" keyProperty="subsId">
