@@ -5,24 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiResultDto {
+public class AiAppleResultDto {
+    private Long appleResultId;
     private Long aiResultId;
-    private double rateS;
-    private double rateA;
-    private double rateB;
-    private String imageUrl;
-    private Long memberId;
-    private String createdAt;
-    private int appleCount;
+    private double ripeness;
     private double redRatio;
     private double greenRatio;
     private double brownRatio;
-
-    private List<AiAppleResultDto> applesResults;
+    private String grade;
+    private String createdAt;
 }

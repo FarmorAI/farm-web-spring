@@ -12,8 +12,8 @@
     </select>
 
     <insert id = "insertAiResult" parameterType="com.farmorai.backend.dto.AiResultDto" useGeneratedKeys="true" keyProperty="aiResultId">
-        INSERT INTO ai_result (rate_s, rate_a, rate_b, image_url, member_id, subs_id)
-        SELECT #{rateS}, #{rateA}, #{rateB}, #{imageUrl}, #{memberId}, subs_id
+        INSERT INTO ai_result (rate_s, rate_a, rate_b, image_url, member_id, subs_id, apple_count, red_ratio, green_ratio, brown_ratio)
+        SELECT #{rateS}, #{rateA}, #{rateB}, #{imageUrl}, #{memberId}, subs_id, #{appleCount}, #{redRatio}, #{greenRatio}, #{brownRatio}
         FROM subscription
         WHERE member_id = #{memberId} AND status = 'ACTIVE'
         LIMIT 1;
@@ -22,4 +22,41 @@
     <delete id = "deleteAiResult" parameterType="Long">
         DELETE FROM ai_result WHERE ai_result_id = #{aiResultId}
     </delete>
+    
+    <select id="getAppleResults">
+        SELECT
+            apple_result_id,
+            ai_result_id,
+            ripeness,
+            red_ratio,
+            green_ratio,
+            brown_ratio,
+            grade,
+            created_at
+        FROM ai_apple_result
+        WHERE ai_result_id = #{aiResultId}
+    </select>
+
+    <insert id="insertAppleResults" parameterType="java.util.List">
+        INSERT INTO ai_apple_result (
+        ai_result_id,
+        ripeness,
+        red_ratio,
+        green_ratio,
+        brown_ratio,
+        grade
+        )
+        VALUES
+        <foreach collection="appleDtoList" item="apple" separator=",">
+            (
+            #{apple.aiResultId},
+            #{apple.ripeness},
+            #{apple.redRatio},
+            #{apple.greenRatio},
+            #{apple.brownRatio},
+            #{apple.grade}
+            )
+        </foreach>
+    </insert>
+
 </mapper>
